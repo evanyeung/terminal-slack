@@ -82,7 +82,7 @@ module.exports = {
             height: '75%',
             left: '5%',
             top: '10%',
-            scrollable: true,
+            //scrollable: true,
             tags: true
         });
 

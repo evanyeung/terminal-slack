@@ -17,6 +17,7 @@ var ui = require('./userInterface.js'),
 slack.init(function(data, ws) {
     var currentUser = data.self;
 
+    // don't update focus until ws is connected
     // focus on the channel list
     components.channelList.select(0);
     components.channelList.focus();
@@ -25,7 +26,27 @@ slack.init(function(data, ws) {
 
     fs.appendFile('./ws_log.txt', '\n\n###############\n\n');
     ws.on('message', function(message, flags){
-        fs.appendFile('./ws_log.txt', message + '\n');
+        message = JSON.parse(message);
+
+        if(message.ok)
+        {
+            fs.appendFile('./ws_log.txt', 'OK');
+            // for some reason getLines gives an object with int keys
+            var lines = components.chatWindow.getLines(),
+                keys = Object.keys(lines),
+                line, i;
+            for(i=keys.length - 1; i >= 0; i--){
+
+                line = lines[keys[i]].split('(pending - ');
+                if (parseInt(line.pop()[0]) === message.reply_to) {
+                    components.chatWindow.deleteLine(parseInt(keys[i]));
+                    components.chatWindow.insertLine(i, line.join(''));
+                    break;
+                }
+            }
+            components.screen.render();
+        }
+        //fs.appendFile('./ws_log.txt', JSON.stringify());
     });
 
     // initialize these event handlers here as they allow functionality
@@ -33,15 +54,17 @@ slack.init(function(data, ws) {
 
     // event handler when message is submitted
     components.messageInput.on('submit', function(text) {
+        var id = getNextId();
         components.messageInput.clearValue();
         components.messageInput.focus();
-        components.chatWindow.insertBottom(
-            '{bold}' + currentUser.name + '{/bold}: ' + text + ' (pending)'
+        components.chatWindow.unshiftLine(
+            '{bold}' + currentUser.name + '{/bold}: ' + text +
+            ' (pending - ' + id +' )'
         );
 
         components.screen.render();
         ws.send(JSON.stringify({
-            id: getNextId(),
+            id: id,
             type: 'message',
             channel: currentChannelId,
             text: text
@@ -101,6 +124,7 @@ components.channelList.on('select', function(data) {
             }
 
             data = JSON.parse(data);
+            components.chatWindow.deleteTop(); // remove loading message
 
             // filter and map the messages before displaying them
             data.messages
@@ -121,9 +145,8 @@ components.channelList.on('select', function(data) {
                 })
                 .reverse() // messages are sent in "reverse"
                 .forEach(function(message) {
-                    components.chatWindow.deleteTop(); // remove loading message
                     // add messages to window
-                    components.chatWindow.insertBottom(
+                    components.chatWindow.unshiftLine(
                         '{bold}' + message.username + '{/bold}: ' + message.text
                     );
                 });
