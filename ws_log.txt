@@ -1,0 +1,10 @@
+{"ok":false,"reply_to":1,"error":{"code":1,"msg":"no channel id"}}
+
+
+###############
+
+{"type":"hello"}
+{"reply_to":1,"type":"message","channel":"C04PQCNK6","user":"U04PQCNK0","text":"Hi","ts":"1431207089.000003"}
+{"type":"channel_marked","channel":"C04PQCNK6","ts":"0000000000.000000"}
+{"ok":true,"reply_to":1,"ts":"1431208006.000004","text":"From Terminal!"}
+{"ok":true,"reply_to":2,"ts":"1431208022.000005","text":":q"}

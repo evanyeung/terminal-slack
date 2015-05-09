@@ -1,0 +1,78 @@
+{
+  "version": "1.7.0",
+  "name": "har-validator",
+  "description": "Extremely fast HTTP Archive (HAR) validator using JSON Schema",
+  "author": {
+    "name": "Ahmad Nassri",
+    "email": "ahmad@ahmadnassri.com",
+    "url": "https://www.ahmadnassri.com/"
+  },
+  "homepage": "https://github.com/ahmadnassri/har-validator",
+  "license": "MIT",
+  "main": "./src/index.js",
+  "bin": {
+    "har-validator": "./bin/har-validator"
+  },
+  "keywords": [
+    "har",
+    "http",
+    "archive",
+    "validate",
+    "validator"
+  ],
+  "engines": {
+    "node": ">=0.10"
+  },
+  "files": [
+    "bin",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahmadnassri/har-validator"
+  },
+  "bugs": {
+    "url": "https://github.com/ahmadnassri/har-validator/issues"
+  },
+  "scripts": {
+    "test": "standard && mocha --reporter spec",
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha",
+    "codeclimate": "codeclimate < coverage/lcov.info"
+  },
+  "devDependencies": {
+    "codeclimate-test-reporter": "0.0.4",
+    "istanbul": "^0.3.13",
+    "mocha": "^2.2.4",
+    "require-directory": "^2.1.0",
+    "should": "^6.0.1",
+    "standard": "^3.7.2"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.25",
+    "chalk": "^1.0.0",
+    "commander": "^2.8.1",
+    "is-my-json-valid": "^2.10.1"
+  },
+  "gitHead": "74aab6b4994681cdb961db88f5129c5096eaf06a",
+  "_id": "har-validator@1.7.0",
+  "_shasum": "563f8c58edca6410e2e408b0e540161da580dc46",
+  "_from": "har-validator@>=1.4.0 <2.0.0",
+  "_npmVersion": "2.5.1",
+  "_nodeVersion": "0.12.1",
+  "_npmUser": {
+    "name": "ahmadnassri",
+    "email": "ahmad@ahmadnassri.com"
+  },
+  "maintainers": [
+    {
+      "name": "ahmadnassri",
+      "email": "ahmad@ahmadnassri.com"
+    }
+  ],
+  "dist": {
+    "shasum": "563f8c58edca6410e2e408b0e540161da580dc46",
+    "tarball": "http://registry.npmjs.org/har-validator/-/har-validator-1.7.0.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/har-validator/-/har-validator-1.7.0.tgz"
+}
