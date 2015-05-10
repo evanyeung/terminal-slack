@@ -24,29 +24,16 @@ slack.init(function(data, ws) {
     // re render screen
     components.screen.render();
 
-    fs.appendFile('./ws_log.txt', '\n\n###############\n\n');
+    //fs.appendFile('./ws_log.txt', '\n\n###############\n\n');
     ws.on('message', function(message, flags){
         message = JSON.parse(message);
 
-        if(message.ok)
-        {
-            fs.appendFile('./ws_log.txt', 'OK');
-            // for some reason getLines gives an object with int keys
-            var lines = components.chatWindow.getLines(),
-                keys = Object.keys(lines),
-                line, i;
-            for(i=keys.length - 1; i >= 0; i--){
-
-                line = lines[keys[i]].split('(pending - ');
-                if (parseInt(line.pop()[0]) === message.reply_to) {
-                    components.chatWindow.deleteLine(parseInt(keys[i]));
-                    components.chatWindow.insertLine(i, line.join(''));
-                    break;
-                }
-            }
-            components.screen.render();
+        if ('reply_to' in message) {
+            handleSentConfirmation(message);
         }
-        //fs.appendFile('./ws_log.txt', JSON.stringify());
+        else if (message.type === 'message') {
+            handleNewMessage(message);
+        }
     });
 
     // initialize these event handlers here as they allow functionality
@@ -168,3 +155,48 @@ components.messageInput.on('cancel', function() {
     components.screen.render();
 });
 
+// handles the reply to say that a message was successfully sent
+function handleSentConfirmation(message) {
+    // for some reason getLines gives an object with int keys
+    var lines = components.chatWindow.getLines(),
+        keys = Object.keys(lines),
+        line, i;
+    for(i=keys.length - 1; i >= 0; i--){
+        line = lines[keys[i]].split('(pending - ');
+        if (parseInt(line.pop()[0]) === message.reply_to) {
+
+            components.chatWindow.deleteLine(parseInt(keys[i]));
+
+            if (message.ok) {
+                components.chatWindow.insertLine(i, line.join(''));
+            }
+            else {
+                components.chatWindow.insertLine(i, line.join('') + ' (FAILED)');
+            }
+            break;
+        }
+    }
+    // for some reason it has to be called twice
+    components.screen.render();
+    components.screen.render();
+}
+
+function handleNewMessage(message) {
+    if(message.channel !== currentChannelId) {
+        return;
+    }
+
+    var len = users.length,
+        username;
+
+    // get the author
+    for(var i=0; i < len; i++) {
+        if (message.user === users[i].id) {
+            username = users[i].name;
+        }
+    }
+    components.chatWindow.unshiftLine(
+        '{bold}' + username + '{/bold}: ' + message.text
+    );
+    components.screen.render();
+}
