@@ -1,4 +1,4 @@
-Slack CLI
-=========
+Terminal Slack
+==============
 
-A command line inteface for Slack.
+A terminal inteface for Slack.
