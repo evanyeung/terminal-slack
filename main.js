@@ -130,7 +130,9 @@ components.channelList.on('select', function(data) {
                     }
                     return {text: message.text, username: username};
                 })
-                .reverse() // messages are sent in "reverse"
+                // Have to add messages in reverse order as no scrolling.
+                // There may be a way to avoid this if I look into blessing more
+                .reverse()
                 .forEach(function(message) {
                     // add messages to window
                     components.chatWindow.unshiftLine(
