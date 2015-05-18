@@ -1,6 +1,6 @@
 var request = require('request'),
     WebSocket = require('ws'),
-    TOKEN = 'xoxp-4806430644-4806430646-4828204363-89ebec';
+    TOKEN = process.env.SLACK_TOKEN;
 
 module.exports = {
     init: function(callback) {
