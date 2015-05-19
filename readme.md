@@ -7,6 +7,7 @@ A terminal interface for Slack.
  - Ctrl-c - select channels list
     - Use the arrow keys and enter to select a channel
  - Ctrl-w - select writing area
+    - Use enter to send a message
  - Ctrl-l - select message list
     - Use the arrow keys to scroll
  
