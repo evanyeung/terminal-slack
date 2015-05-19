@@ -44,10 +44,11 @@ slack.init(function(data, ws) {
         var id = getNextId();
         components.messageInput.clearValue();
         components.messageInput.focus();
-        components.chatWindow.unshiftLine(
+        components.chatWindow.insertBottom(
             '{bold}' + currentUser.name + '{/bold}: ' + text +
             ' (pending - ' + id +' )'
         );
+        components.chatWindow.scroll(1);
 
         components.screen.render();
         ws.send(JSON.stringify({
@@ -135,13 +136,14 @@ components.channelList.on('select', function(data) {
                 .reverse()
                 .forEach(function(message) {
                     // add messages to window
-                    components.chatWindow.unshiftLine(
+                    components.chatWindow.insertBottom(
                         '{bold}' + message.username + '{/bold}: ' + message.text
                     );
                 });
 
             // reset messageInput and give focus
             components.messageInput.clearValue();
+            components.chatWindow.scrollTo(components.chatWindow.getLines().length);
             components.messageInput.focus();
             components.screen.render();
 
@@ -149,12 +151,6 @@ components.channelList.on('select', function(data) {
             slack.markChannel(currentChannelId, data.latest);
         });
     });
-});
-
-// event handler when input is deselected
-components.messageInput.on('cancel', function() {
-    components.channelList.focus();
-    components.screen.render();
 });
 
 // handles the reply to say that a message was successfully sent
