@@ -129,14 +129,12 @@ components.channelList.on('select', function(data) {
                             username = users[i].name;
                         }
                     }
+
                     return {text: message.text, username: username};
                 })
-                // Have to add messages in reverse order as no scrolling.
-                // There may be a way to avoid this if I look into blessing more
-                .reverse()
                 .forEach(function(message) {
                     // add messages to window
-                    components.chatWindow.insertBottom(
+                    components.chatWindow.unshiftLine(
                         '{bold}' + message.username + '{/bold}: ' + message.text
                     );
                 });
@@ -174,8 +172,7 @@ function handleSentConfirmation(message) {
             break;
         }
     }
-    // for some reason it has to be called twice
-    components.screen.render();
+    components.chatWindow.scroll(1);
     components.screen.render();
 }
 
@@ -193,8 +190,9 @@ function handleNewMessage(message) {
             username = users[i].name;
         }
     }
-    components.chatWindow.unshiftLine(
+    components.chatWindow.insertBottom(
         '{bold}' + username + '{/bold}: ' + message.text
     );
+    components.chatWindow.scroll(1);
     components.screen.render();
 }
