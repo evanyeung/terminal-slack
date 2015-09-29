@@ -6,7 +6,8 @@ module.exports = {
         var screen = blessed.screen({
             autopadding: true,
             smartCSR: true,
-            title: 'Slack'
+            title: 'Slack',
+            fullUnicode: true
             }),
 
             container = blessed.box({
