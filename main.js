@@ -36,6 +36,10 @@ slack.init(function(data, ws) {
         }
     });
 
+    ws.on('error', function(error) {
+       // console.error('ws error: ', error);
+    });
+
     // initialize these event handlers here as they allow functionality
     // that relies on websockets
 
