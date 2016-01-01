@@ -26,7 +26,13 @@
 // IN THE SOFTWARE.
 
 var EventEmitter = require('events').EventEmitter;
-var StringDecoder = require('string_decoder').StringDecoder;
+
+// NOTE: node <=v0.8.x has no EventEmitter.listenerCount
+function listenerCount(stream, event) {
+  return EventEmitter.listenerCount
+    ? EventEmitter.listenerCount(stream, event)
+    : stream.listeners(event).length;
+}
 
 /**
  * accepts a readable Stream instance and makes it emit "keypress" events
@@ -38,7 +44,7 @@ function emitKeypressEvents(stream) {
   stream._keypressDecoder = new StringDecoder('utf8');
 
   function onData(b) {
-    if (EventEmitter.listenerCount(stream, 'keypress') > 0) {
+    if (listenerCount(stream, 'keypress') > 0) {
       var r = stream._keypressDecoder.write(b);
       if (r) emitKeys(stream, r);
     } else {
@@ -49,13 +55,13 @@ function emitKeypressEvents(stream) {
   }
 
   function onNewListener(event) {
-    if (event == 'keypress') {
+    if (event === 'keypress') {
       stream.on('data', onData);
       stream.removeListener('newListener', onNewListener);
     }
   }
 
-  if (EventEmitter.listenerCount(stream, 'keypress') > 0) {
+  if (listenerCount(stream, 'keypress') > 0) {
     stream.on('data', onData);
   } else {
     stream.on('newListener', onNewListener);
