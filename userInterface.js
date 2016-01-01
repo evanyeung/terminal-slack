@@ -6,7 +6,8 @@ module.exports = {
         var screen = blessed.screen({
             autopadding: true,
             smartCSR: true,
-            title: 'Slack'
+            title: 'Slack',
+            fullUnicode: true
             }),
 
             container = blessed.box({
@@ -19,7 +20,7 @@ module.exports = {
             }),
 
             sideBar = blessed.box({
-                width: '30%',
+                width: '15%',
                 height: '100%',
                 border: {
                     type: 'line'
@@ -44,7 +45,7 @@ module.exports = {
                 width: '90%',
                 height: '85%',
                 left: '5%',
-                top: '10%',
+                top: '5%',
                 keys: true,
                 vi: true,
                 style: {
@@ -57,9 +58,9 @@ module.exports = {
             }),
 
             mainWindow = blessed.box({
-                width: '70%',
+                width: '85%',
                 height: '100%',
-                left: '30%',
+                left: '15%',
                 //scrollable: true,
                 border: {
                     type: 'line'
@@ -77,18 +78,18 @@ module.exports = {
             }),
 
             chatWindow = blessed.box({
-                width: '90%',
-                height: '75%',
-                left: '5%',
-                top: '10%',
+                width: '98%',
+                height: '85%',
+                left: '1%',
+                top: '5%',
                 scrollable: true,
                 alwaysScroll: true,
                 tags: true
             }),
 
             messageInput = blessed.textbox({
-                width: '90%',
-                left: '5%',
+                width: '98%',
+                left: '1%',
                 top: '85%',
                 keys: true,
                 inputOnFocus: true,
@@ -127,7 +128,7 @@ module.exports = {
             if (    key.full === 'escape' ||
                     key.full === 'C-c'    ||
                     key.full === 'C-w'    ||
-                    key.full === 'C-l'   ) {
+                    key.full === 'C-l' ) {
                 messageInput.cancel();
                 keyBindings(ch, key);
             }
@@ -135,12 +136,12 @@ module.exports = {
 
         // scrolling in chat window
         chatWindow.on('keypress', function(ch, key) {
-            if (key.name === 'up') {
+            if (key.name === 'up' || key.full === 'C-p') {
                 chatWindow.scroll(-1);
                 screen.render();
                 return;
             }
-            if (key.name === 'down') {
+            if (key.name === 'down' || key.full === 'C-n') {
                 chatWindow.scroll(1);
                 screen.render();
                 return;
