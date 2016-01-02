@@ -2,83 +2,84 @@ var request = require('request'),
     WebSocket = require('ws'),
     TOKEN = process.env.SLACK_TOKEN;
 
+if (TOKEN === undefined) {
+    console.log('Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables.');
+    process.exit(1);
+}
+
+// makes a request to slack. Adds token to query
+function slackRequest(endpoint, query, callback) {
+    var qs = query;
+    qs.token = TOKEN;
+    request.get({
+        url: 'https://slack.com/api/' + endpoint,
+        qs: qs
+    },
+    function (error, response, data) {
+        if (error) {
+            require('fs').writeFileSync('error_log.txt', error);
+            process.exit(1);
+        }
+        if (response.statusCode != 200) {
+            require('fs').writeFileSync('error_log.txt', 'Response Error: ' + response.statusCode);
+            process.exit(1);
+        }
+
+        var parsedData = JSON.parse(data);
+        if (!parsedData.ok) {
+            // can't see console.logs with blessed
+            require('fs').writeFileSync('error_log.txt', 'Error: ' + parsedData.error);
+            process.exit(1);
+        }
+        if (callback) { callback(error, response, data); }
+    });
+}
+
 module.exports = {
     init: function(callback) {
-        var self = this;
-        request.get({
-            url: 'https://slack.com/api/rtm.start',
-            qs: {
-                token: TOKEN
-            }
-        },
-        function(error, response, data) {
-            if (response.statusCode != 200) {
-                console.log("Error: ", response.statusCode);
-                return;
-            }
-
+        slackRequest('rtm.start', {}, function(error, response, data) {
             data = JSON.parse(data);
             var ws = new WebSocket(data.url);
             callback(data, ws);
         });
     },
     getChannels: function(callback) {
-
-        request.get({
-            url: 'https://slack.com/api/channels.list',
-            qs: {
-                token: TOKEN,
-            }
-        },
-        function(error, response, data) {
+        slackRequest('channels.list', {}, function(error, response, data) {
             if(callback) callback(error, response, data);
         });
     },
     joinChannel: function(name, callback) {
-        request.get({
-            url: 'https://slack.com/api/channels.join',
-            qs: {
-                token: TOKEN,
-                name: name
+        slackRequest(
+            'channels.join',
+            {name: name},
+            function(error, response, data) {
+                if(callback) callback(error, response, data);
             }
-        },
-        function(error, response, data) {
-            if(callback) callback(error, response, data);
-        });
+        );
     },
     getChannelHistory: function(id, callback) {
-        request.get({
-            url: 'https://slack.com/api/channels.history',
-            qs: {
-                token: TOKEN,
-                channel: id
+        slackRequest(
+            'channels.history',
+            {channel: id},
+            function(error, response, data) {
+                if(callback) callback(error, response, data);
             }
-        },
-        function(error, response, data) {
-            if(callback) callback(error, response, data);
-        });
+        );
     },
     markChannel: function(id, timestamp, callback) {
-        request.get({
-            url: 'https://slack.com/api/channels.mark',
-            qs: {
-                token: TOKEN,
+        slackRequest(
+            'channels.mark',
+            {
                 channel: id,
                 ts: timestamp
+            },
+            function(error, response, data) {
+                if(callback) callback(error, response, data);
             }
-        },
-        function(error, response, data) {
-            if(callback) callback(error, response, data);
-        });
+        );
     },
     getUsers: function(callback) {
-        request.get({
-            url: 'https://slack.com/api/users.list',
-            qs: {
-                token: TOKEN,
-            }
-        },
-        function(error, response, data) {
+        slackRequest('users.list', {}, function(error, response, data) {
             if(callback) callback(error, response, data);
         });
     }

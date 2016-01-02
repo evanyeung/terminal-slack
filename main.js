@@ -115,10 +115,11 @@ components.channelList.on('select', function(data) {
             components.chatWindow.deleteTop(); // remove loading message
 
             // filter and map the messages before displaying them
-            data.messages
+            var messages = data.messages
                 .filter(function(item) {
                     return (item.type === 'message');
-                })
+                });
+            messages
                 .map(function(message) {
                     var len = users.length,
                         username;
@@ -146,7 +147,7 @@ components.channelList.on('select', function(data) {
             components.screen.render();
 
             // mark the most recently read message
-            slack.markChannel(currentChannelId, data.latest);
+            slack.markChannel(currentChannelId, messages[0].ts);
         });
     });
 });

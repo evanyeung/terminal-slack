@@ -4,9 +4,9 @@ module.exports = {
 
     init: function() {
         var screen = blessed.screen({
-            autopadding: true,
-            smartCSR: true,
-            title: 'Slack'
+                autopadding: true,
+                smartCSR: true,
+                title: 'Slack'
             }),
 
             container = blessed.box({
