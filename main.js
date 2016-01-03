@@ -94,7 +94,11 @@ slack.getChannels(function(error, response, data){
     }
 
     data = JSON.parse(data);
-    channels = data.channels;
+    channels = [];
+    for(var i = 0; i < data.channels.length; i++) {
+        var channel = data.channels[i];
+        if(!channel.is_archived) channels.push(channel);
+    }
     components.channelList.setItems(
         channels.map(function(channel) {
             return channel.name;
