@@ -4,9 +4,10 @@
   "description": "A terminal client for slack",
   "main": "main.js",
   "dependencies": {
-    "ws": "^0.7.1",
+    "blessed": "^0.1.56",
+    "dotenv": "^2.0.0",
     "request": "^2.55.0",
-    "blessed": "^0.1.56"
+    "ws": "^0.7.1"
   },
   "devDependencies": {},
   "scripts": {
