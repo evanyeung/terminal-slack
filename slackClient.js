@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var request = require('request'),
     WebSocket = require('ws'),
     TOKEN = process.env.SLACK_TOKEN;
