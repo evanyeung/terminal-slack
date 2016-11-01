@@ -4,8 +4,10 @@ Terminal Slack
 A terminal interface for Slack.
 
 ##Controls
+ - Ctrl-u - select users list
+    - Use the arrow keys (j or k) and enter to select a channel
  - Ctrl-c - select channels list
-    - Use the arrow keys and enter to select a channel
+    - Use the arrow keys (j or k) and enter to select a channel
  - Ctrl-w - select writing area
     - Use enter to send a message
  - Ctrl-l - select message list
