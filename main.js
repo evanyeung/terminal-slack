@@ -25,7 +25,6 @@ slack.init(function(data, ws) {
     // re render screen
     components.screen.render();
 
-    //fs.appendFile('./ws_log.txt', '\n\n###############\n\n');
     ws.on('message', function(message, flags){
         message = JSON.parse(message);
 
@@ -74,11 +73,13 @@ slack.init(function(data, ws) {
             user = data.members[i];
             if(!user.deleted && user.id != currentUser.id) users.push(user);
         }
+
         components.userList.setItems(
            users.map(function(user) {
                return user.name;
            })
         );
+        components.screen.render();
     });
 });
 
@@ -104,10 +105,11 @@ slack.getChannels(function(error, response, data){
             return channel.name;
         })
     );
+    components.screen.render();
 });
 
 // event handler when user selects a channel
-updateMessages = function(data, markFn) {
+var updateMessages = function(data, markFn) {
     components.chatWindow.deleteTop(); // remove loading message
 
     // filter and map the messages before displaying them
@@ -120,7 +122,8 @@ updateMessages = function(data, markFn) {
                 username;
 
             // get the author
-            if(message.user === currentUser.id) username = currentUser.name
+            if(message.user === currentUser.id)
+              username = currentUser.name;
             else
                 for(var i=0; i < len; i++) {
                     if (message.user === users[i].id) {
@@ -139,7 +142,9 @@ updateMessages = function(data, markFn) {
         });
 
     // mark the most recently read message
-    markFn(currentChannelId, data.messages[0].ts);
+    if (data.messages.length) {
+        markFn(currentChannelId, data.messages[0].ts);
+    }
 
     // reset messageInput and give focus
     components.messageInput.clearValue();
@@ -147,6 +152,7 @@ updateMessages = function(data, markFn) {
     components.messageInput.focus();
     components.screen.render();
 };
+
 components.userList.on('select', function(data) {
     var userName = data.content;
 
@@ -175,6 +181,7 @@ components.userList.on('select', function(data) {
         });
     });
 });
+
 components.channelList.on('select', function(data) {
     var channelName = data.content;
 

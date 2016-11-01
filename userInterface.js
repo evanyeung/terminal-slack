@@ -18,9 +18,15 @@ module.exports = {
                 }
             }),
 
-            usersBox = blessed.box({
+            sideBar = blessed.box({
                 width: '30%',
-                height: '30%',
+                height: '100%',
+            }),
+
+            usersBox = blessed.box({
+                width: '100%',
+                height: '40%',
+                top: '60%',
                 border: {
                     type: 'line'
                 },
@@ -31,6 +37,7 @@ module.exports = {
                 }
 
             }),
+
             usersTitle = blessed.text({
                 width: '90%',
                 left: '5%',
@@ -38,11 +45,12 @@ module.exports = {
                 content: '{bold}Users{/bold}',
                 tags: true
             }),
+
             userList = blessed.list({
                 width: '90%',
-                height: '90%',
+                height: '70%',
                 left: '5%',
-                top: '10%',
+                top: '20%',
                 keys: true,
                 vi: true,
                 style: {
@@ -55,9 +63,8 @@ module.exports = {
             }),
 
             channelsBox = blessed.box({
-                width: '30%',
-                height: '70%',
-                top: '30%',
+                width: '100%',
+                height: '60%',
                 border: {
                     type: 'line'
                 },
@@ -68,6 +75,7 @@ module.exports = {
                 }
 
             }),
+
             channelsTitle = blessed.text({
                 width: '90%',
                 left: '5%',
@@ -75,9 +83,10 @@ module.exports = {
                 content: '{bold}Channels{/bold}',
                 tags: true
             }),
+
             channelList = blessed.list({
                 width: '90%',
-                height: '90%',
+                height: '85%',
                 left: '5%',
                 top: '10%',
                 keys: true,
@@ -135,15 +144,16 @@ module.exports = {
                 }
             });
 
-        usersBox.append(usersTitle);
-        usersBox.append(userList);
         channelsBox.append(channelsTitle);
         channelsBox.append(channelList);
+        usersBox.append(usersTitle);
+        usersBox.append(userList);
+        sideBar.append(channelsBox);
+        sideBar.append(usersBox);
         mainWindow.append(mainWindowTitle);
         mainWindow.append(chatWindow);
         mainWindow.append(messageInput);
-        container.append(usersBox);
-        container.append(channelsBox);
+        container.append(sideBar);
         container.append(mainWindow);
         screen.append(container);
 
@@ -151,7 +161,7 @@ module.exports = {
             switch (key.full) {
                 case 'escape': process.exit(0);
                     break;
-                case 'C-u': userList.focus(); // ctrl-c for users
+                case 'C-u': userList.focus(); // ctrl-u for users
                     break;
                 case 'C-c': channelList.focus(); // ctrl-c for channels
                     break;
@@ -193,22 +203,22 @@ module.exports = {
         });
 
         // event handlers for focus and blur of inputs
-        onFocus = function() {
-            mainWindow.style.border = {'fg': '#cc6666'};
+        var onFocus = function(component) {
+            component.style.border = {'fg': '#cc6666'};
             screen.render();
         };
-        onBlur = function() {
-            mainWindow.style.border = {'fg': '#888'};
+        var onBlur = function(component) {
+            component.style.border = {'fg': '#888'};
             screen.render();
         };
-        userList.on('focus', onFocus);
-        userList.on('blur', onBlur);
-        channelList.on('focus', onFocus);
-        channelList.on('blur', onBlur);
-        messageInput.on('focus', onFocus);
-        messageInput.on('blur', onBlur);
-        chatWindow.on('focus', onFocus);
-        chatWindow.on('blur', onBlur);
+        userList.on('focus', onFocus.bind(null, usersBox));
+        userList.on('blur', onBlur.bind(null, usersBox));
+        channelList.on('focus', onFocus.bind(null, channelsBox));
+        channelList.on('blur', onBlur.bind(null, channelsBox));
+        messageInput.on('focus', onFocus.bind(null, messageInput));
+        messageInput.on('blur', onBlur.bind(null, messageInput));
+        chatWindow.on('focus', onFocus.bind(null, mainWindow));
+        chatWindow.on('blur', onBlur.bind(null, mainWindow));
 
         return {
             screen: screen,
