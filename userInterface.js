@@ -178,14 +178,14 @@ module.exports = {
     channelList.on('keypress', keyBindings);
     chatWindow.on('keypress', keyBindings);
     messageInput.on('keypress', function(ch, key){
-      if (    key.full === 'escape' ||
-        key.full === 'C-u'    ||
-        key.full === 'C-c'    ||
-        key.full === 'C-w'    ||
-        key.full === 'C-l'   ) {
-          messageInput.cancel();
-          keyBindings(ch, key);
-        }
+      if (key.full === 'escape' ||
+          key.full === 'C-u'    ||
+          key.full === 'C-c'    ||
+          key.full === 'C-w'    ||
+          key.full === 'C-l') {
+        messageInput.cancel();
+        keyBindings(ch, key);
+      }
     });
 
     // scrolling in chat window

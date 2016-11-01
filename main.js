@@ -67,9 +67,11 @@ slack.init(function(data, ws) {
 
     data = JSON.parse(data);
     users = [];
-    for(var i = 0; i < data.members.length; i++) {
+    for (var i = 0; i < data.members.length; i++) {
       user = data.members[i];
-      if(!user.deleted && user.id != currentUser.id) users.push(user);
+      if (!user.deleted && user.id != currentUser.id) {
+        users.push(user);
+      }
     }
 
     components.userList.setItems(
@@ -94,9 +96,11 @@ slack.getChannels(function(error, response, data){
 
   data = JSON.parse(data);
   channels = [];
-  for(var i = 0; i < data.channels.length; i++) {
+  for (var i = 0; i < data.channels.length; i++) {
     var channel = data.channels[i];
-    if(!channel.is_archived) channels.push(channel);
+    if (!channel.is_archived) {
+      channels.push(channel);
+    }
   }
   components.channelList.setItems(
     channels.map(function(channel) {
@@ -120,15 +124,16 @@ var updateMessages = function(data, markFn) {
         username;
 
       // get the author
-      if(message.user === currentUser.id)
+      if (message.user === currentUser.id) {
         username = currentUser.name;
-      else
-        for(var i=0; i < len; i++) {
+      } else {
+        for (var i=0; i < len; i++) {
           if (message.user === users[i].id) {
             username = users[i].name;
             break;
           }
         }
+      }
 
       return {text: message.text, username: username};
     })
@@ -161,9 +166,9 @@ components.userList.on('select', function(data) {
 
   // get user's id
   var userId = '';
-  for(var i = 0; i < users.length; i++) {
+  for (var i = 0; i < users.length; i++) {
     user = users[i];
-    if(user.name === userName) {
+    if (user.name === userName) {
       userId = user.id;
       break;
     }
@@ -207,7 +212,7 @@ function handleSentConfirmation(message) {
   var lines = components.chatWindow.getLines(),
     keys = Object.keys(lines),
     line, i;
-  for(i=keys.length - 1; i >= 0; i--){
+  for (i=keys.length - 1; i >= 0; i--) {
     line = lines[keys[i]].split('(pending - ');
     if (parseInt(line.pop()[0]) === message.reply_to) {
 
@@ -215,8 +220,7 @@ function handleSentConfirmation(message) {
 
       if (message.ok) {
         components.chatWindow.insertLine(i, line.join(''));
-      }
-      else {
+      } else {
         components.chatWindow.insertLine(i, line.join('') + ' (FAILED)');
       }
       break;
@@ -227,7 +231,7 @@ function handleSentConfirmation(message) {
 }
 
 function handleNewMessage(message) {
-  if(message.channel !== currentChannelId) {
+  if (message.channel !== currentChannelId) {
     return;
   }
 
@@ -235,7 +239,7 @@ function handleNewMessage(message) {
     username;
 
   // get the author
-  for(var i=0; i < len; i++) {
+  for (var i=0; i < len; i++) {
     if (message.user === users[i].id) {
       username = users[i].name;
     }

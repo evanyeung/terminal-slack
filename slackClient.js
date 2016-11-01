@@ -33,7 +33,9 @@ function slackRequest(endpoint, query, callback) {
         process.exit(1);
       }
 
-      if (callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
 }
 
@@ -47,56 +49,72 @@ module.exports = {
   },
   getChannels: function(callback) {
     slackRequest('channels.list', {}, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
   joinChannel: function(name, callback) {
     slackRequest('channels.join', {
       name: name
     }, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
   getChannelHistory: function(id, callback) {
     slackRequest('channels.history', {
       channel: id
     }, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
   markChannel: function(id, timestamp, callback) {
     slackRequest('channels.mark', {
-      channel: id, 
+      channel: id,
       ts: timestamp
     }, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
   getUsers: function(callback) {
     slackRequest('users.list', {}, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
   openIm: function(id, callback) {
     slackRequest('im.open', {
       user: id
     }, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
   getImHistory: function(id, callback) {
     slackRequest('im.history', {
       channel: id
     }, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
   markIm: function(id, timestamp, callback) {
     slackRequest('im.mark', {
-      channel: id, 
+      channel: id,
       ts: timestamp
     }, function(error, response, data) {
-      if(callback) callback.apply(this, arguments);
+      if (callback) {
+        callback.apply(this, arguments);
+      }
     });
   },
 };
