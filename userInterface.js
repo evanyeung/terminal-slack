@@ -2,147 +2,145 @@ var blessed = require('blessed');
 
 module.exports = {
 
-  init: function() {
+  init: function () {
     var screen = blessed.screen({
-        autopadding: true,
-        smartCSR: true,
-        title: 'Slack'
-      }),
+      autopadding: true,
+      smartCSR: true,
+      title: 'Slack',
+    });
 
-      container = blessed.box({
-        width: '100%',
-        height: '100%',
-        style: {
-          fg: '#bbb',
-          bg: '#1d1f21'
-        }
-      }),
+    var container = blessed.box({
+      width: '100%',
+      height: '100%',
+      style: {
+        fg: '#bbb',
+        bg: '#1d1f21',
+      },
+    });
 
-      sideBar = blessed.box({
-        width: '30%',
-        height: '100%',
-      }),
+    var sideBar = blessed.box({
+      width: '30%',
+      height: '100%',
+    });
 
-      usersBox = blessed.box({
-        width: '100%',
-        height: '40%',
-        top: '60%',
+    var usersBox = blessed.box({
+      width: '100%',
+      height: '40%',
+      top: '60%',
+      border: {
+        type: 'line',
+      },
+      style: {
         border: {
-          type: 'line'
+          fg: '#888',
         },
-        style: {
-          border: {
-            fg: '#888'
-          }
-        }
+      },
+    });
 
-      }),
+    var usersTitle = blessed.text({
+      width: '90%',
+      left: '5%',
+      align: 'center',
+      content: '{bold}Users{/bold}',
+      tags: true,
+    });
 
-      usersTitle = blessed.text({
-        width: '90%',
-        left: '5%',
-        align: 'center',
-        content: '{bold}Users{/bold}',
-        tags: true
-      }),
-
-      userList = blessed.list({
-        width: '90%',
-        height: '70%',
-        left: '5%',
-        top: '20%',
-        keys: true,
-        vi: true,
-        style: {
-          selected: {
-            bg: '#373b41',
-            fg: '#c5c8c6'
-          }
+    var userList = blessed.list({
+      width: '90%',
+      height: '70%',
+      left: '5%',
+      top: '20%',
+      keys: true,
+      vi: true,
+      style: {
+        selected: {
+          bg: '#373b41',
+          fg: '#c5c8c6',
         },
-        tags: true
-      }),
+      },
+      tags: true,
+    });
 
-      channelsBox = blessed.box({
-        width: '100%',
-        height: '60%',
+    var channelsBox = blessed.box({
+      width: '100%',
+      height: '60%',
+      border: {
+        type: 'line',
+      },
+      style: {
         border: {
-          type: 'line'
+          fg: '#888',
         },
-        style: {
-          border: {
-            fg: '#888'
-          }
-        }
+      },
+    });
 
-      }),
+    var channelsTitle = blessed.text({
+      width: '90%',
+      left: '5%',
+      align: 'center',
+      content: '{bold}Channels{/bold}',
+      tags: true,
+    });
 
-      channelsTitle = blessed.text({
-        width: '90%',
-        left: '5%',
-        align: 'center',
-        content: '{bold}Channels{/bold}',
-        tags: true
-      }),
-
-      channelList = blessed.list({
-        width: '90%',
-        height: '85%',
-        left: '5%',
-        top: '10%',
-        keys: true,
-        vi: true,
-        style: {
-          selected: {
-            bg: '#373b41',
-            fg: '#c5c8c6'
-          }
+    var channelList = blessed.list({
+      width: '90%',
+      height: '85%',
+      left: '5%',
+      top: '10%',
+      keys: true,
+      vi: true,
+      style: {
+        selected: {
+          bg: '#373b41',
+          fg: '#c5c8c6',
         },
-        tags: true
-      }),
+      },
+      tags: true,
+    });
 
-      mainWindow = blessed.box({
-        width: '70%',
-        height: '100%',
-        left: '30%',
-        //scrollable: true,
+    var mainWindow = blessed.box({
+      width: '70%',
+      height: '100%',
+      left: '30%',
+      // scrollable: true,
+      border: {
+        type: 'line',
+      },
+      style: {
         border: {
-          type: 'line'
+          fg: '#888',
         },
-        style: {
-          border: {
-            fg: '#888'
-          }
-        }
-      }),
+      },
+    });
 
-      mainWindowTitle = blessed.text({
-        width: '90%',
-        tags: true
-      }),
+    var mainWindowTitle = blessed.text({
+      width: '90%',
+      tags: true,
+    });
 
-      chatWindow = blessed.box({
-        width: '90%',
-        height: '75%',
-        left: '5%',
-        top: '10%',
-        keys: true,
-        vi: true,
-        scrollable: true,
-        alwaysScroll: true,
-        tags: true
-      }),
+    var chatWindow = blessed.box({
+      width: '90%',
+      height: '75%',
+      left: '5%',
+      top: '10%',
+      keys: true,
+      vi: true,
+      scrollable: true,
+      alwaysScroll: true,
+      tags: true,
+    });
 
-      messageInput = blessed.textbox({
-        width: '90%',
-        left: '5%',
-        top: '85%',
-        keys: true,
-        vi: true,
-        inputOnFocus: true,
-        border: {
-          type: 'line'
-        }
-      });
+    var messageInput = blessed.textbox({
+      width: '90%',
+      left: '5%',
+      top: '85%',
+      keys: true,
+      vi: true,
+      inputOnFocus: true,
+      border: {
+        type: 'line',
+      },
+    });
 
     channelsBox.append(channelsTitle);
     channelsBox.append(channelList);
@@ -169,6 +167,8 @@ module.exports = {
           break;
         case 'C-l': chatWindow.focus(); // ctrl-l for message list
           break;
+        default:
+          break;
       }
       return;
     }
@@ -177,11 +177,11 @@ module.exports = {
     userList.on('keypress', keyBindings);
     channelList.on('keypress', keyBindings);
     chatWindow.on('keypress', keyBindings);
-    messageInput.on('keypress', function(ch, key){
+    messageInput.on('keypress', function (ch, key) {
       if (key.full === 'escape' ||
-          key.full === 'C-u'    ||
-          key.full === 'C-c'    ||
-          key.full === 'C-w'    ||
+          key.full === 'C-u' ||
+          key.full === 'C-c' ||
+          key.full === 'C-w' ||
           key.full === 'C-l') {
         messageInput.cancel();
         keyBindings(ch, key);
@@ -189,7 +189,7 @@ module.exports = {
     });
 
     // scrolling in chat window
-    chatWindow.on('keypress', function(ch, key) {
+    chatWindow.on('keypress', function (ch, key) {
       if (key.name === 'up') {
         chatWindow.scroll(-1);
         screen.render();
@@ -203,12 +203,12 @@ module.exports = {
     });
 
     // event handlers for focus and blur of inputs
-    var onFocus = function(component) {
-      component.style.border = {'fg': '#cc6666'};
+    var onFocus = function (component) {
+      component.style.border = { fg: '#cc6666' }; // eslint-disable-line no-param-reassign
       screen.render();
     };
-    var onBlur = function(component) {
-      component.style.border = {'fg': '#888'};
+    var onBlur = function (component) {
+      component.style.border = { fg: '#888' }; // eslint-disable-line no-param-reassign
       screen.render();
     };
     userList.on('focus', onFocus.bind(null, usersBox));
@@ -231,8 +231,7 @@ module.exports = {
       mainWindow: mainWindow,
       mainWindowTitle: mainWindowTitle,
       chatWindow: chatWindow,
-      messageInput: messageInput
+      messageInput: messageInput,
     };
-  }
-
+  },
 };
