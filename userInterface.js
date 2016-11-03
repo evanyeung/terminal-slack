@@ -1,7 +1,6 @@
 var blessed = require('blessed');
 
 module.exports = {
-
   init: function () {
     var screen = blessed.screen({
       autopadding: true,

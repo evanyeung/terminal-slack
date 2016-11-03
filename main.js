@@ -45,15 +45,11 @@ function handleNewMessage(message) {
     return;
   }
 
-  var len = users.length;
-  var username;
-
   // get the author
-  for (var i = 0; i < len; i += 1) {
-    if (message.user === users[i].id) {
-      username = users[i].name;
-    }
-  }
+  var username = users.find(function (user) {
+    return message.user === user.id;
+  }).name;
+
   components.chatWindow.insertBottom(
     '{bold}' + username + '{/bold}: ' + message.text
   );
@@ -112,14 +108,9 @@ slack.init(function (data, ws) {
     }
 
     var parsedUserData = JSON.parse(userData);
-    var user;
-    users = [];
-    for (var i = 0; i < parsedUserData.members.length; i += 1) {
-      user = parsedUserData.members[i];
-      if (!user.deleted && user.id !== currentUser.id) {
-        users.push(user);
-      }
-    }
+    users = parsedUserData.members.filter(function (user) {
+      return !user.deleted && user.id !== currentUser.id;
+    });
 
     components.userList.setItems(
       users.map(function (slackUser) {
@@ -142,13 +133,10 @@ slack.getChannels(function (error, response, data) {
   }
 
   var channelData = JSON.parse(data);
-  channels = [];
-  for (var i = 0; i < channelData.channels.length; i += 1) {
-    var channel = channelData.channels[i];
-    if (!channel.is_archived) {
-      channels.push(channel);
-    }
-  }
+  channels = channelData.channels.filter(function (channel) {
+    return !channel.is_archived;
+  });
+
   components.channelList.setItems(
     channels.map(function (slackChannel) {
       return slackChannel.name;
@@ -212,15 +200,9 @@ components.userList.on('select', function (data) {
   components.screen.render();
 
   // get user's id
-  var userId = '';
-  var user;
-  for (var i = 0; i < users.length; i += 1) {
-    user = users[i];
-    if (user.name === userName) {
-      userId = user.id;
-      break;
-    }
-  }
+  var userId = users.find(function (potentialUser) {
+    return potentialUser.name === userName;
+  }).id;
 
   slack.openIm(userId, function (error, response, imData) {
     var parsedImData = JSON.parse(imData);
