@@ -7,6 +7,11 @@ var currentUser;
 var channels;
 var currentChannelId;
 
+// This is a hack to make the message list scroll to the bottom whenever a message is sent.
+// Multiline messages would otherwise only scroll one line per message leaving part of the message
+// cut off. This assumes that messages will be less than 50 lines high in the chat window.
+var SCROLL_PER_MESSAGE = 50;
+
   // generates ids for messages
 var getNextId = (function () {
   var id = 0;
@@ -36,7 +41,7 @@ function handleSentConfirmation(message) {
       break;
     }
   }
-  components.chatWindow.scroll(1);
+  components.chatWindow.scroll(SCROLL_PER_MESSAGE);
   components.screen.render();
 }
 
@@ -53,7 +58,7 @@ function handleNewMessage(message) {
   components.chatWindow.insertBottom(
     '{bold}' + username + '{/bold}: ' + message.text
   );
-  components.chatWindow.scroll(1);
+  components.chatWindow.scroll(SCROLL_PER_MESSAGE);
   components.screen.render();
 }
 
@@ -85,10 +90,11 @@ slack.init(function (data, ws) {
     var id = getNextId();
     components.messageInput.clearValue();
     components.messageInput.focus();
+    components.chatWindow.scrollTo(components.chatWindow.getLines().length * SCROLL_PER_MESSAGE);
     components.chatWindow.insertBottom(
       '{bold}' + currentUser.name + '{/bold}: ' + text + ' (pending - ' + id + ' )'
     );
-    components.chatWindow.scroll(1);
+    components.chatWindow.scroll(SCROLL_PER_MESSAGE);
 
     components.screen.render();
     ws.send(JSON.stringify({
@@ -100,7 +106,7 @@ slack.init(function (data, ws) {
   });
 
   // set the user list to the users returned from slack
-  // call here to check against currentUser
+  // called here to check against currentUser
   slack.getUsers(function (error, response, userData) {
     if (error || response.statusCode !== 200) {
       console.log('Error: ', error, response || response.statusCode);
@@ -186,7 +192,7 @@ var updateMessages = function (data, markFn) {
 
   // reset messageInput and give focus
   components.messageInput.clearValue();
-  components.chatWindow.scrollTo(components.chatWindow.getLines().length);
+  components.chatWindow.scrollTo(components.chatWindow.getLines().length * SCROLL_PER_MESSAGE);
   components.messageInput.focus();
   components.screen.render();
 };
