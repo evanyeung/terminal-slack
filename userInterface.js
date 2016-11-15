@@ -1,16 +1,16 @@
-var blessed = require('blessed');
+const blessed = require('blessed');
 
-var keyBindings = {};
+const keyBindings = {};
 
 module.exports = {
-  init: function () {
-    var screen = blessed.screen({
+  init() {
+    const screen = blessed.screen({
       autopadding: true,
       smartCSR: true,
       title: 'Slack',
     });
 
-    var container = blessed.box({
+    const container = blessed.box({
       width: '100%',
       height: '100%',
       style: {
@@ -19,12 +19,12 @@ module.exports = {
       },
     });
 
-    var sideBar = blessed.box({
+    const sideBar = blessed.box({
       width: '30%',
       height: '100%',
     });
 
-    var mainWindow = blessed.box({
+    const mainWindow = blessed.box({
       width: '70%',
       height: '100%',
       left: '30%',
@@ -39,12 +39,12 @@ module.exports = {
       },
     });
 
-    var mainWindowTitle = blessed.text({
+    const mainWindowTitle = blessed.text({
       width: '90%',
       tags: true,
     });
 
-    var chatWindow = blessed.box({
+    const chatWindow = blessed.box({
       width: '90%',
       height: '75%',
       left: '5%',
@@ -56,7 +56,7 @@ module.exports = {
       tags: true,
     });
 
-    var messageInput = blessed.textbox({
+    const messageInput = blessed.textbox({
       width: '90%',
       left: '5%',
       top: '85%',
@@ -69,14 +69,14 @@ module.exports = {
     });
 
     function searchChannels(searchCallback) {
-      var searchBoxTitle = blessed.text({
+      const searchBoxTitle = blessed.text({
         width: '90%',
         left: '5%',
         align: 'left',
         content: '{bold}Search{/bold}',
         tags: true,
       });
-      var searchBox = blessed.textbox({
+      const searchBox = blessed.textbox({
         width: '90%',
         height: 'shrink',
         left: '5%',
@@ -97,17 +97,17 @@ module.exports = {
         mainWindow.append(messageInput);
         screen.render();
       }
-      searchBox.on('keypress', function (ch, key) {
+      searchBox.on('keypress', (ch, key) => {
         if (Object.keys(keyBindings).includes(key.full)) {
           searchBox.cancel();
           removeSearchBox();
-          var fn = keyBindings[key.full];
+          const fn = keyBindings[key.full];
           if (fn) {
             fn();
           }
         }
       });
-      searchBox.on('submit', function (text) {
+      searchBox.on('submit', (text) => {
         removeSearchBox();
         searchCallback(text);
       });
@@ -120,7 +120,7 @@ module.exports = {
       screen.render();
     }
 
-    var channelsBox = blessed.box({
+    const channelsBox = blessed.box({
       width: '100%',
       height: '60%',
       border: {
@@ -133,7 +133,7 @@ module.exports = {
       },
     });
 
-    var channelsTitle = blessed.text({
+    const channelsTitle = blessed.text({
       width: '90%',
       left: '5%',
       align: 'center',
@@ -141,7 +141,7 @@ module.exports = {
       tags: true,
     });
 
-    var channelList = blessed.list({
+    const channelList = blessed.list({
       width: '90%',
       height: '85%',
       left: '5%',
@@ -158,7 +158,7 @@ module.exports = {
       tags: true,
     });
 
-    var usersBox = blessed.box({
+    const usersBox = blessed.box({
       width: '100%',
       height: '40%',
       top: '60%',
@@ -172,7 +172,7 @@ module.exports = {
       },
     });
 
-    var usersTitle = blessed.text({
+    const usersTitle = blessed.text({
       width: '90%',
       left: '5%',
       align: 'center',
@@ -180,7 +180,7 @@ module.exports = {
       tags: true,
     });
 
-    var userList = blessed.list({
+    const userList = blessed.list({
       width: '90%',
       height: '70%',
       left: '5%',
@@ -217,7 +217,7 @@ module.exports = {
     keyBindings['C-l'] = chatWindow.focus.bind(chatWindow);     // ctrl-l for message list
 
     function callKeyBindings(ch, key) {
-      var fn = keyBindings[key.full];
+      const fn = keyBindings[key.full];
       if (fn) {
         fn();
       }
@@ -226,7 +226,7 @@ module.exports = {
     userList.on('keypress', callKeyBindings);
     channelList.on('keypress', callKeyBindings);
     chatWindow.on('keypress', callKeyBindings);
-    messageInput.on('keypress', function (ch, key) {
+    messageInput.on('keypress', (ch, key) => {
       if (Object.keys(keyBindings).includes(key.full)) {
         messageInput.cancel();
         callKeyBindings(ch, key);
@@ -234,7 +234,7 @@ module.exports = {
     });
 
     // scrolling in chat window
-    chatWindow.on('keypress', function (ch, key) {
+    chatWindow.on('keypress', (ch, key) => {
       if (key.name === 'up') {
         chatWindow.scroll(-1);
         screen.render();
@@ -248,11 +248,11 @@ module.exports = {
     });
 
     // event handlers for focus and blur of inputs
-    var onFocus = function (component) {
+    const onFocus = (component) => {
       component.style.border = { fg: '#cc6666' }; // eslint-disable-line no-param-reassign
       screen.render();
     };
-    var onBlur = function (component) {
+    const onBlur = (component) => {
       component.style.border = { fg: '#888' }; // eslint-disable-line no-param-reassign
       screen.render();
     };
@@ -266,17 +266,17 @@ module.exports = {
     chatWindow.on('blur', onBlur.bind(null, mainWindow));
 
     return {
-      screen: screen,
-      usersBox: usersBox,
-      channelsBox: channelsBox,
-      usersTitle: usersTitle,
-      userList: userList,
-      channelsTitle: channelsTitle,
-      channelList: channelList,
-      mainWindow: mainWindow,
-      mainWindowTitle: mainWindowTitle,
-      chatWindow: chatWindow,
-      messageInput: messageInput,
+      screen,
+      usersBox,
+      channelsBox,
+      usersTitle,
+      userList,
+      channelsTitle,
+      channelList,
+      mainWindow,
+      mainWindowTitle,
+      chatWindow,
+      messageInput,
     };
   },
 };
