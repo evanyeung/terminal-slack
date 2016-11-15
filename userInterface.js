@@ -92,6 +92,7 @@ module.exports = {
       function removeSearchBox() {
         mainWindow.remove(searchBox);
         mainWindow.remove(searchBoxTitle);
+        mainWindow.append(mainWindowTitle);
         mainWindow.append(chatWindow);
         mainWindow.append(messageInput);
         screen.render();
@@ -110,6 +111,7 @@ module.exports = {
         removeSearchBox();
         searchCallback(text);
       });
+      mainWindow.remove(mainWindowTitle);
       mainWindow.remove(chatWindow);
       mainWindow.remove(messageInput);
       mainWindow.append(searchBoxTitle);
