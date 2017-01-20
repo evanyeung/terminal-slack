@@ -15,7 +15,8 @@
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.5.0"
   },
-  "scripts": {
+    "scripts": {
+    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
