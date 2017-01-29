@@ -1,5 +1,21 @@
 var blessed = require('blessed');
+var colorPal = require('./themes.js');
+var supportsColor = require('supports-color');
 
+// Colors
+var colorSupportLevel = supportsColor ? supportsColor.level : 0;
+var defaultThemesByColorLevel = {
+    3: colorPal.default,
+    2: colorPal.default, // Not tested yet
+    1: colorPal.tty16Default,
+    0: colorPal.tty1Default // Can be "tested" by passing --no-color argument
+};
+
+var theme = defaultThemesByColorLevel[colorSupportLevel];
+var colors = theme.palette;
+
+
+// UI
 var keyBindings = {};
 
 module.exports = {
@@ -7,21 +23,21 @@ module.exports = {
     var screen = blessed.screen({
       autopadding: true,
       smartCSR: true,
-      title: 'Slack',
+      title: 'Slack'
     });
 
     var container = blessed.box({
       width: '100%',
       height: '100%',
       style: {
-        fg: '#bbb',
-        bg: '#1d1f21',
-      },
+        fg: colors.fg,
+        bg: colors.bg
+      }
     });
 
     var sideBar = blessed.box({
       width: '30%',
-      height: '100%',
+      height: '100%'
     });
 
     var mainWindow = blessed.box({
@@ -30,18 +46,18 @@ module.exports = {
       left: '30%',
       // scrollable: true,
       border: {
-        type: 'line',
+        type: 'line'
       },
       style: {
         border: {
-          fg: '#888',
-        },
-      },
+          fg: colors.boxBorderFG
+        }
+      }
     });
 
     var mainWindowTitle = blessed.text({
       width: '90%',
-      tags: true,
+      tags: true
     });
 
     var chatWindow = blessed.box({
@@ -53,7 +69,7 @@ module.exports = {
       vi: true,
       scrollable: true,
       alwaysScroll: true,
-      tags: true,
+      tags: true
     });
 
     var messageInput = blessed.textbox({
@@ -64,8 +80,8 @@ module.exports = {
       vi: true,
       inputOnFocus: true,
       border: {
-        type: 'line',
-      },
+        type: 'line'
+      }
     });
 
     function searchChannels(searchCallback) {
@@ -74,7 +90,7 @@ module.exports = {
         left: '5%',
         align: 'left',
         content: '{bold}Search{/bold}',
-        tags: true,
+        tags: true
       });
       var searchBox = blessed.textbox({
         width: '90%',
@@ -85,9 +101,9 @@ module.exports = {
         vi: true,
         inputOnFocus: true,
         border: {
-          fg: '#cc6666',
-          type: 'line',
-        },
+          fg: colors.searchFG,
+          type: 'line'
+        }
       });
       function removeSearchBox() {
         mainWindow.remove(searchBox);
@@ -124,13 +140,13 @@ module.exports = {
       width: '100%',
       height: '60%',
       border: {
-        type: 'line',
+        type: 'line'
       },
       style: {
         border: {
-          fg: '#888',
-        },
-      },
+          fg: colors.boxBorderFG
+        }
+      }
     });
 
     var channelsTitle = blessed.text({
@@ -138,7 +154,7 @@ module.exports = {
       left: '5%',
       align: 'center',
       content: '{bold}Channels{/bold}',
-      tags: true,
+      tags: true
     });
 
     var channelList = blessed.list({
@@ -151,11 +167,11 @@ module.exports = {
       search: searchChannels,
       style: {
         selected: {
-          bg: '#373b41',
-          fg: '#c5c8c6',
-        },
+          bg: colors.listSelectedItemBG,
+          fg: colors.listSelectedItemFG
+        }
       },
-      tags: true,
+      tags: true
     });
 
     var usersBox = blessed.box({
@@ -163,13 +179,13 @@ module.exports = {
       height: '40%',
       top: '60%',
       border: {
-        type: 'line',
+        type: 'line'
       },
       style: {
         border: {
-          fg: '#888',
-        },
-      },
+          fg: colors.boxBorderFG
+        }
+      }
     });
 
     var usersTitle = blessed.text({
@@ -177,7 +193,7 @@ module.exports = {
       left: '5%',
       align: 'center',
       content: '{bold}Users{/bold}',
-      tags: true,
+      tags: true
     });
 
     var userList = blessed.list({
@@ -190,11 +206,11 @@ module.exports = {
       search: searchChannels,
       style: {
         selected: {
-          bg: '#373b41',
-          fg: '#c5c8c6',
-        },
+          bg: colors.listSelectedItemBG,
+          fg: colors.listSelectedItemFG
+        }
       },
-      tags: true,
+      tags: true
     });
 
     channelsBox.append(channelsTitle);
@@ -249,11 +265,11 @@ module.exports = {
 
     // event handlers for focus and blur of inputs
     var onFocus = function (component) {
-      component.style.border = { fg: '#cc6666' }; // eslint-disable-line no-param-reassign
+      component.style.border = { fg: colors.focusBorder }; // eslint-disable-line no-param-reassign
       screen.render();
     };
     var onBlur = function (component) {
-      component.style.border = { fg: '#888' }; // eslint-disable-line no-param-reassign
+      component.style.border = { fg: colors.boxBorderFG }; // eslint-disable-line no-param-reassign
       screen.render();
     };
     userList.on('focus', onFocus.bind(null, usersBox));
@@ -276,7 +292,7 @@ module.exports = {
       mainWindow: mainWindow,
       mainWindowTitle: mainWindowTitle,
       chatWindow: chatWindow,
-      messageInput: messageInput,
+      messageInput: messageInput
     };
-  },
+  }
 };
