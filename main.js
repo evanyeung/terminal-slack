@@ -7,6 +7,7 @@ var currentUser;
 var channels;
 var currentChannelId;
 
+var UNKNOWN_USER_NAME = "Unknown User";
 // This is a hack to make the message list scroll to the bottom whenever a message is sent.
 // Multiline messages would otherwise only scroll one line per message leaving part of the message
 // cut off. This assumes that messages will be less than 50 lines high in the chat window.
@@ -54,7 +55,7 @@ function handleNewMessage(message) {
   var user = users.find(function (user) {
     return message.user === user.id;
   });
-  var username = (user && user.name) || "Unknown User";
+  var username = (user && user.name) || UNKNOWN_USER_NAME;
 
   components.chatWindow.insertBottom(
     '{bold}' + username + '{/bold}: ' + message.text
@@ -177,7 +178,7 @@ var updateMessages = function (data, markFn) {
         }
       }
 
-      return { text: message.text, username: username };
+      return { text: message.text, username: username || UNKNOWN_USER_NAME};
     })
     .forEach(function (message) {
       // add messages to window
