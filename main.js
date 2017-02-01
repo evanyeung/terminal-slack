@@ -51,9 +51,10 @@ function handleNewMessage(message) {
   }
 
   // get the author
-  var username = users.find(function (user) {
+  var user = users.find(function (user) {
     return message.user === user.id;
-  }).name;
+  });
+  var username = (user && user.name) || "Unknown User";
 
   components.chatWindow.insertBottom(
     '{bold}' + username + '{/bold}: ' + message.text
@@ -242,4 +243,3 @@ components.channelList.on('select', function (data) {
     );
   });
 });
-
