@@ -10,7 +10,7 @@ let currentUser;
 let channels;
 let currentChannelId;
 
-var UNKNOWN_USER_NAME = "Unknown User";
+const UNKNOWN_USER_NAME = 'Unknown User';
 // This is a hack to make the message list scroll to the bottom whenever a message is sent.
 // Multiline messages would otherwise only scroll one line per message leaving part of the message
 // cut off. This assumes that messages will be less than 50 lines high in the chat window.
@@ -49,17 +49,49 @@ function handleSentConfirmation(message) {
   components.screen.render();
 }
 
+// formats channel and user mentions readably
+function formatMessageMentions(text) {
+  let formattedText = text;
+  // find user mentions
+  const userMentions = text.match(/<@U[a-zA-Z0-9]+>/g);
+  if (userMentions !== null) {
+    userMentions
+      .map(match => match.substr(2, match.length - 3))
+      .forEach((userId) => {
+        let username;
+        let modifier;
+        if (userId === currentUser.id) {
+          username = currentUser.name;
+          modifier = 'yellow-fg';
+        } else {
+          const user = users.find(potentialUser => potentialUser.id === userId);
+          username = user === undefined ? UNKNOWN_USER_NAME : user.name;
+          modifier = 'underline';
+        }
+
+        formattedText = text.replace(
+          new RegExp(`<@${userId}>`, 'g'),
+          `{${modifier}}@${username}{/${modifier}}`);
+      });
+  }
+
+  // find special words
+  return formattedText.replace(
+    /<!channel>/g,
+    '{yellow-fg}@channel{/yellow-fg}');
+}
+
 function handleNewMessage(message) {
   let username;
-  if (message.user === currentUser.id){
+  if (message.user === currentUser.id) {
     username = currentUser.name;
   } else {
-    const user = users.find(user => message.user === user.id);
-    username = (user && user.name) || UNKNOWN_USER_NAME;
+    const author = users.find(user => message.user === user.id);
+    username = (author && author.name) || UNKNOWN_USER_NAME;
 
     notifier.notify({
       icon: path.join(__dirname, 'Slack_Mark_Black_Web.png'),
-      message: username + ': '+ message.text ,
+      message: `${username}: ${message.text}`,
       sound: true,
       title: 'Terminal Slack',
     });
@@ -159,41 +191,6 @@ slack.getChannels((error, response, data) => {
   components.screen.render();
 });
 
-// formats channel and user mentions readably
-function formatMessageMentions(text) {
-  var formattedText = text;
-  // find user mentions
-  var userMentions = text.match(/<@U[a-zA-Z0-9]+>/g);
-  if (userMentions !== null) {
-    userMentions.map(function(match) {
-      return match.substr(2, match.length - 3);
-    })
-    .forEach(function(userId) {
-      var username;
-      var modifier;
-      if (userId === currentUser.id) {
-        username = currentUser.name;
-        modifier = 'yellow-fg';
-      } else {
-        var user = users.find(function (potentialUser) {
-          return potentialUser.id === userId;
-        });
-        username = user === undefined ? UNKNOWN_USER_NAME : user.name;
-        modifier = 'underline';
-      }
-
-      formattedText = text.replace(
-        new RegExp('<@' + userId + '>', 'g'),
-        '{'+modifier+'}@' + username + '{/'+modifier+'}');
-    });
-  }
-
-  // find special words
-  return formattedText.replace(
-    /<\!channel>/g,
-    '{yellow-fg}@channel{/yellow-fg}');
-}
-
 // event handler when user selects a channel
 function updateMessages(data, markFn) {
   components.chatWindow.deleteTop(); // remove loading message
@@ -217,7 +214,7 @@ function updateMessages(data, markFn) {
           }
         }
       }
-      return { text: message.text, username: username || UNKNOWN_USER_NAME};
+      return { text: message.text, username: username || UNKNOWN_USER_NAME };
     })
     .forEach((message) => {
       // add messages to window
