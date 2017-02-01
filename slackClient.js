@@ -17,28 +17,28 @@ function slackRequest(endpoint, query, callback) {
     url: 'https://slack.com/api/' + endpoint,
     qs: qs,
   },
-    function (error, response, data) {
-      if (error) {
-        fs.writeFileSync('error_log.txt', error);
-        process.exit(1);
-      }
+  function (error, response, data) {
+    if (error) {
+      fs.writeFileSync('error_log.txt', error);
+      process.exit(1);
+    }
 
-      if (response.statusCode !== 200) {
-        fs.writeFileSync('error_log.txt', 'Response Error: ' + response.statusCode);
-        process.exit(1);
-      }
+    if (response.statusCode !== 200) {
+      fs.writeFileSync('error_log.txt', 'Response Error: ' + response.statusCode);
+      process.exit(1);
+    }
 
-      var parsedData = JSON.parse(data);
-      if (!parsedData.ok) {
-        // can't see console.logs with blessed
-        fs.writeFileSync('error_log.txt', 'Error: ' + parsedData.error);
-        process.exit(1);
-      }
+    var parsedData = JSON.parse(data);
+    if (!parsedData.ok) {
+      // can't see console.logs with blessed
+      fs.writeFileSync('error_log.txt', 'Error: ' + parsedData.error);
+      process.exit(1);
+    }
 
-      if (callback) {
-        callback.apply(this, arguments);
-      }
-    });
+    if (callback) {
+      callback.apply(this, arguments);
+    }
+  });
 }
 
 module.exports = {
