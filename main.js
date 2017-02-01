@@ -1,7 +1,9 @@
+var notifier = require('node-notifier');
+var path = require('path');
+
 var ui = require('./userInterface.js');
 var slack = require('./slackClient.js');
-const notifier = require('node-notifier');
-const path = require('path');
+
 var components = ui.init(); // ui components
 var users;
 var currentUser;
@@ -50,7 +52,7 @@ function handleSentConfirmation(message) {
 function handleNewMessage(message) {
   var username;
   if (message.user === currentUser.id){
-    username =  currentUser.name;
+    username = currentUser.name;
   } else {
     var user = users.find(function (user) {
       return message.user === user.id;
@@ -58,13 +60,10 @@ function handleNewMessage(message) {
     username = (user && user.name) || UNKNOWN_USER_NAME;
 
     notifier.notify({
-      icon: path.join(__dirname, 'slack.png'),
+      icon: path.join(__dirname, 'Slack_Mark_Black_Web.png'),
       message: username + ': '+ message.text ,
-      sound: 'Glass',
-      title: 'Terminal slack',
-      wait: true
-    }, function (err, response) {
-      // Response is response from notification
+      sound: true,
+      title: 'Terminal Slack',
     });
   }
 
