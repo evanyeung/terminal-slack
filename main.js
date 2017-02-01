@@ -1,4 +1,3 @@
-/* vim: set sts=2 ts=2 sw=2: */
 var ui = require('./userInterface.js');
 var slack = require('./slackClient.js');
 
@@ -59,7 +58,7 @@ function handleNewMessage(message) {
   var username = (user && user.name) || UNKNOWN_USER_NAME;
 
   components.chatWindow.insertBottom(
-    '{bold}' + username + '{/bold}: ' + formatMessage(message.text)
+    '{bold}' + username + '{/bold}: ' + formatMessageMentions(message.text)
   );
   components.chatWindow.scroll(SCROLL_PER_MESSAGE);
   components.screen.render();
@@ -155,40 +154,42 @@ slack.getChannels(function (error, response, data) {
 });
 
 // formats channel and user mentions readably
-var formatMessage = function (text) {
-    // find user mentions
-    var userMentions = text.match(/<@U[a-zA-Z0-9]+>/g);
-    if (userMentions !== null) {
-      userMentions.map(function(match) {
-        return match.substr(2, match.length - 3);
-      }).forEach(function(userId) {
-        if (userId === currentUser.id) {
-          var userName = currentUser.name;
-          var modifier = 'yellow-fg';
-        } else {
-          var user = users.find(function (potentialUser) {
-            return potentialUser.id === userId;
-          });
-          if (user === undefined) {
-            return;
-          }
-          var userName = user.name;
-          var modifier = 'underline';
-        }
+function formatMessageMentions(text) {
+  var formattedText = text;
+  // find user mentions
+  var userMentions = text.match(/<@U[a-zA-Z0-9]+>/g);
+  if (userMentions !== null) {
+    userMentions.map(function(match) {
+      return match.substr(2, match.length - 3);
+    })
+    .forEach(function(userId) {
+      var username;
+      var modifier;
+      if (userId === currentUser.id) {
+        username = currentUser.name;
+        modifier = 'yellow-fg';
+      } else {
+        var user = users.find(function (potentialUser) {
+          return potentialUser.id === userId;
+        });
+        username = user === undefined ? UNKNOWN_USER_NAME : user.name;
+        modifier = 'underline';
+      }
 
-        var re = new RegExp('<@' + userId + '>', 'g');
-        text = text.replace(re, '{'+modifier+'}@' + userName + '{/'+modifier+'}');
-      });
-    }
+      formattedText = text.replace(
+        new RegExp('<@' + userId + '>', 'g'),
+        '{'+modifier+'}@' + username + '{/'+modifier+'}');
+    });
+  }
 
-    // find special words
-    text = text.replace(/<\!channel>/g, '{yellow-fg}@channel{/yellow-fg}');
-
-    return text;
-};
+  // find special words
+  return formattedText.replace(
+    /<\!channel>/g,
+    '{yellow-fg}@channel{/yellow-fg}');
+}
 
 // event handler when user selects a channel
-var updateMessages = function (data, markFn) {
+function updateMessages(data, markFn) {
   components.chatWindow.deleteTop(); // remove loading message
 
   // filter and map the messages before displaying them
@@ -217,7 +218,7 @@ var updateMessages = function (data, markFn) {
     .forEach(function (message) {
       // add messages to window
       components.chatWindow.unshiftLine(
-        '{bold}' + message.username + '{/bold}: ' + formatMessage(message.text)
+        '{bold}' + message.username + '{/bold}: ' + formatMessageMentions(message.text)
       );
     });
 
@@ -231,19 +232,19 @@ var updateMessages = function (data, markFn) {
   components.chatWindow.scrollTo(components.chatWindow.getLines().length * SCROLL_PER_MESSAGE);
   components.messageInput.focus();
   components.screen.render();
-};
+}
 
 components.userList.on('select', function (data) {
-  var userName = data.content;
+  var username = data.content;
 
   // a channel was selected
-  components.mainWindowTitle.setContent('{bold}' + userName + '{/bold}');
+  components.mainWindowTitle.setContent('{bold}' + username + '{/bold}');
   components.chatWindow.setContent('Getting messages...');
   components.screen.render();
 
   // get user's id
   var userId = users.find(function (potentialUser) {
-    return potentialUser.name === userName;
+    return potentialUser.name === username;
   }).id;
 
   slack.openIm(userId, function (error, response, imData) {
