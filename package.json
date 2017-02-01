@@ -4,9 +4,11 @@
   "description": "A terminal client for slack",
   "main": "main.js",
   "dependencies": {
-    "ws": "^0.7.1",
+    "blessed": "^0.1.56",
+    "node-notifier": "^5.0.2",
     "request": "^2.55.0",
-    "blessed": "^0.1.56"
+    "supports-color": "^3.2.3",
+    "ws": "^0.7.1"
   },
   "devDependencies": {
     "eslint": "^3.9.1",
@@ -16,6 +18,7 @@
     "eslint-plugin-react": "^6.5.0"
   },
   "scripts": {
+    "start": "node .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -1,6 +1,7 @@
 var ui = require('./userInterface.js');
 var slack = require('./slackClient.js');
-
+const notifier = require('node-notifier');
+const path = require('path');
 var components = ui.init(); // ui components
 var users;
 var currentUser;
@@ -13,7 +14,7 @@ var UNKNOWN_USER_NAME = "Unknown User";
 // cut off. This assumes that messages will be less than 50 lines high in the chat window.
 var SCROLL_PER_MESSAGE = 50;
 
-  // generates ids for messages
+// generates ids for messages
 var getNextId = (function () {
   var id = 0;
   return function () {
@@ -47,15 +48,29 @@ function handleSentConfirmation(message) {
 }
 
 function handleNewMessage(message) {
+  var username;
+  if (message.user === currentUser.id){
+    username =  currentUser.name;
+  } else {
+    var user = users.find(function (user) {
+      return message.user === user.id;
+    });
+    username = (user && user.name) || UNKNOWN_USER_NAME;
+
+    notifier.notify({
+      icon: path.join(__dirname, 'slack.png'),
+      message: username + ': '+ message.text ,
+      sound: 'Glass',
+      title: 'Terminal slack',
+      wait: true
+    }, function (err, response) {
+      // Response is response from notification
+    });
+  }
+
   if (message.channel !== currentChannelId) {
     return;
   }
-
-  // get the author
-  var user = users.find(function (user) {
-    return message.user === user.id;
-  });
-  var username = (user && user.name) || UNKNOWN_USER_NAME;
 
   components.chatWindow.insertBottom(
     '{bold}' + username + '{/bold}: ' + formatMessageMentions(message.text)
@@ -212,7 +227,6 @@ function updateMessages(data, markFn) {
           }
         }
       }
-
       return { text: message.text, username: username || UNKNOWN_USER_NAME};
     })
     .forEach(function (message) {
