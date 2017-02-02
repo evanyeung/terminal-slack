@@ -1,108 +1,15 @@
-const notifier = require('node-notifier');
-const path = require('path');
-
 const slack = require('./slackClient.js');
 const components = require('./userInterface.js');
+const formatMessage = require('./formatMessage.js');
+const rtmCallbacks = require('./rtmCallbacks');
 const utils = require('./utils.js');
+
+const { SCROLL_PER_MESSAGE, UNKNOWN_USER_NAME } = require('./constants.js');
 
 let users;
 let currentUser;
 let channels;
 let currentChannelId;
-
-const UNKNOWN_USER_NAME = 'Unknown User';
-// This is a hack to make the message list scroll to the bottom whenever a message is sent.
-// Multiline messages would otherwise only scroll one line per message leaving part of the message
-// cut off. This assumes that messages will be less than 50 lines high in the chat window.
-const SCROLL_PER_MESSAGE = 50;
-
-// handles the reply to say that a message was successfully sent
-function handleSentConfirmation(message) {
-  // for some reason getLines gives an object with int keys
-  const lines = components.chatWindow.getLines();
-  const keys = Object.keys(lines);
-  let line;
-  let i;
-  for (i = keys.length - 1; i >= 0; i -= 1) {
-    line = lines[keys[i]].split('(pending - ');
-    if (parseInt(line.pop()[0], 10) === message.reply_to) {
-      components.chatWindow.deleteLine(parseInt(keys[i], 10));
-
-      if (message.ok) {
-        components.chatWindow.insertLine(i, line.join(''));
-      } else {
-        components.chatWindow.insertLine(i, `${line.join('')} (FAILED)`);
-      }
-      break;
-    }
-  }
-  components.chatWindow.scroll(SCROLL_PER_MESSAGE);
-  components.screen.render();
-}
-
-// formats channel and user mentions readably
-function formatMessageMentions(text) {
-  if (text === null || typeof text === 'undefined') {
-    return '';
-  }
-
-  let formattedText = text;
-  // find user mentions
-  const userMentions = text.match(/<@U[a-zA-Z0-9]+>/g);
-  if (userMentions !== null) {
-    userMentions
-      .map(match => match.substr(2, match.length - 3))
-      .forEach((userId) => {
-        let username;
-        let modifier;
-        if (userId === currentUser.id) {
-          username = currentUser.name;
-          modifier = 'yellow-fg';
-        } else {
-          const user = users.find(potentialUser => potentialUser.id === userId);
-          username = typeof user === 'undefined' ? UNKNOWN_USER_NAME : user.name;
-          modifier = 'underline';
-        }
-
-        formattedText = text.replace(
-          new RegExp(`<@${userId}>`, 'g'),
-          `{${modifier}}@${username}{/${modifier}}`);
-      });
-  }
-
-  // find special words
-  return formattedText.replace(
-    /<!channel>/g,
-    '{yellow-fg}@channel{/yellow-fg}');
-}
-
-function handleNewMessage(message) {
-  let username;
-  if (message.user === currentUser.id) {
-    username = currentUser.name;
-  } else {
-    const author = users.find(user => message.user === user.id);
-    username = (author && author.name) || UNKNOWN_USER_NAME;
-
-    notifier.notify({
-      icon: path.join(__dirname, 'Slack_Mark_Black_Web.png'),
-      message: `${username}: ${message.text}`,
-      sound: true,
-      title: 'Terminal Slack',
-    });
-  }
-
-  if (message.channel !== currentChannelId ||
-      typeof message.text === 'undefined') {
-    return;
-  }
-
-  components.chatWindow.insertBottom(
-    `{bold}${username}{/bold}: ${formatMessageMentions(message.text)}`
-  );
-  components.chatWindow.scroll(SCROLL_PER_MESSAGE);
-  components.screen.render();
-}
 
 slack.init((data, ws) => {
   currentUser = data.self;
@@ -115,13 +22,7 @@ slack.init((data, ws) => {
   components.screen.render();
 
   ws.on('message', (message /* , flags */) => {
-    const parsedMessage = JSON.parse(message);
-
-    if ('reply_to' in parsedMessage) {
-      handleSentConfirmation(parsedMessage);
-    } else if (parsedMessage.type === 'message') {
-      handleNewMessage(parsedMessage);
-    }
+    rtmCallbacks.onMessage({ currentChannelId, currentUser, users }, message);
   });
 
   // initialize these event handlers here as they allow functionality
@@ -219,7 +120,7 @@ function updateMessages(data, markFn) {
     .forEach((message) => {
       // add messages to window
       components.chatWindow.unshiftLine(
-        `{bold}${message.username}{/bold}: ${formatMessageMentions(message.text)}`
+        `{bold}${message.username}{/bold}: ${formatMessage(message.text, currentUser, users)}`
       );
     });
 
