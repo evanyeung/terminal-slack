@@ -2,10 +2,9 @@ const notifier = require('node-notifier');
 const path = require('path');
 
 const slack = require('./slackClient.js');
-const ui = require('./userInterface.js');
+const components = require('./userInterface.js');
 const utils = require('./utils.js');
 
-const components = ui.init(); // ui components
 let users;
 let currentUser;
 let channels;
