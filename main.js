@@ -51,6 +51,10 @@ function handleSentConfirmation(message) {
 
 // formats channel and user mentions readably
 function formatMessageMentions(text) {
+  if (text === null || typeof text === 'undefined') {
+    return;
+  }
+
   let formattedText = text;
   // find user mentions
   const userMentions = text.match(/<@U[a-zA-Z0-9]+>/g);
@@ -65,7 +69,7 @@ function formatMessageMentions(text) {
           modifier = 'yellow-fg';
         } else {
           const user = users.find(potentialUser => potentialUser.id === userId);
-          username = user === undefined ? UNKNOWN_USER_NAME : user.name;
+          username = typeof user === 'undefined' ? UNKNOWN_USER_NAME : user.name;
           modifier = 'underline';
         }
 
@@ -97,7 +101,8 @@ function handleNewMessage(message) {
     });
   }
 
-  if (message.channel !== currentChannelId) {
+  if (message.channel !== currentChannelId ||
+      typeof message.text === 'undefined') {
     return;
   }
 
@@ -197,7 +202,11 @@ function updateMessages(data, markFn) {
 
   // filter and map the messages before displaying them
   data.messages
+    .filter(item => !item.hidden)
     .filter(item => item.type === 'message')
+    // Some messages related to message threading don't have text. This feature
+    // isn't supported by terminal-slack right now so we filter them out
+    .filter(item => typeof item.text !== 'undefined')
     .map((message) => {
       const len = users.length;
       let username;
