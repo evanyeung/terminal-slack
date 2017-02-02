@@ -1,8 +1,9 @@
 const notifier = require('node-notifier');
 const path = require('path');
 
-const ui = require('./userInterface.js');
 const slack = require('./slackClient.js');
+const ui = require('./userInterface.js');
+const utils = require('./utils.js');
 
 const components = ui.init(); // ui components
 let users;
@@ -15,15 +16,6 @@ const UNKNOWN_USER_NAME = 'Unknown User';
 // Multiline messages would otherwise only scroll one line per message leaving part of the message
 // cut off. This assumes that messages will be less than 50 lines high in the chat window.
 const SCROLL_PER_MESSAGE = 50;
-
-// generates ids for messages
-const getNextId = (() => {
-  let id = 0;
-  return () => {
-    id += 1;
-    return id;
-  };
-})();
 
 // handles the reply to say that a message was successfully sent
 function handleSentConfirmation(message) {
@@ -138,7 +130,7 @@ slack.init((data, ws) => {
 
   // event handler when message is submitted
   components.messageInput.on('submit', (text) => {
-    const id = getNextId();
+    const id = utils.getNextId();
     components.messageInput.clearValue();
     components.messageInput.focus();
     components.chatWindow.scrollTo(components.chatWindow.getLines().length * SCROLL_PER_MESSAGE);
