@@ -52,7 +52,7 @@ function handleSentConfirmation(message) {
 // formats channel and user mentions readably
 function formatMessageMentions(text) {
   if (text === null || typeof text === 'undefined') {
-    return;
+    return '';
   }
 
   let formattedText = text;
