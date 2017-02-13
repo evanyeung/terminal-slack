@@ -2,15 +2,16 @@ const notifier = require('node-notifier');
 const path = require('path');
 
 const components = require('./userInterface.js');
+const dataStore = require('./dataStore.js');
 const formatMessage = require('./formatMessage.js');
 
 const { SCROLL_PER_MESSAGE, UNKNOWN_USER_NAME } = require('./constants.js');
 
 function handleNewMessage(globals, message) {
-  const { currentChannelId, currentUser, users } = globals;
+  const { users } = globals;
   let username;
-  if (message.user === currentUser.id) {
-    username = currentUser.name;
+  if (message.user === dataStore.getCurrentUser().id) {
+    username = dataStore.getCurrentUser().name;
   } else {
     const author = users.find(user => message.user === user.id);
     username = (author && author.name) || UNKNOWN_USER_NAME;
@@ -23,13 +24,13 @@ function handleNewMessage(globals, message) {
     });
   }
 
-  if (message.channel !== currentChannelId ||
+  if (message.channel !== dataStore.getCurrentChannelId() ||
       typeof message.text === 'undefined') {
     return;
   }
 
   components.chatWindow.insertBottom(
-    `{bold}${username}{/bold}: ${formatMessage(message.text, currentUser, users)}`
+    `{bold}${username}{/bold}: ${formatMessage(message.text, users)}`
   );
   components.chatWindow.scroll(SCROLL_PER_MESSAGE);
   components.screen.render();

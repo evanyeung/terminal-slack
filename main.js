@@ -1,5 +1,6 @@
 const slack = require('./slackClient.js');
 const components = require('./userInterface.js');
+const dataStore = require('./dataStore.js');
 const formatMessage = require('./formatMessage.js');
 const rtmCallbacks = require('./rtmCallbacks');
 const utils = require('./utils.js');
@@ -7,12 +8,10 @@ const utils = require('./utils.js');
 const { SCROLL_PER_MESSAGE, UNKNOWN_USER_NAME } = require('./constants.js');
 
 let users;
-let currentUser;
 let channels;
-let currentChannelId;
 
 slack.init((data, ws) => {
-  currentUser = data.self;
+  dataStore.setCurrentUser(data.self);
 
   // don't update focus until ws is connected
   // focus on the channel list
@@ -22,7 +21,7 @@ slack.init((data, ws) => {
   components.screen.render();
 
   ws.on('message', (message /* , flags */) => {
-    rtmCallbacks.onMessage({ currentChannelId, currentUser, users }, message);
+    rtmCallbacks.onMessage({ users }, message);
   });
 
   // initialize these event handlers here as they allow functionality
@@ -35,7 +34,7 @@ slack.init((data, ws) => {
     components.messageInput.focus();
     components.chatWindow.scrollTo(components.chatWindow.getLines().length * SCROLL_PER_MESSAGE);
     components.chatWindow.insertBottom(
-      `{bold}${currentUser.name}{/bold}: ${text} (pending - ${id})`
+      `{bold}${dataStore.getCurrentUser().name}{/bold}: ${text} (pending - ${id})`
     );
     components.chatWindow.scroll(SCROLL_PER_MESSAGE);
 
@@ -43,13 +42,13 @@ slack.init((data, ws) => {
     ws.send(JSON.stringify({
       id,
       type: 'message',
-      channel: currentChannelId,
+      channel: dataStore.getCurrentChannelId(),
       text,
     }));
   });
 
   // set the user list to the users returned from slack
-  // called here to check against currentUser
+  // called here to check against current user
   slack.getUsers((error, response, userData) => {
     if (error || response.statusCode !== 200) {
       console.log( // eslint-disable-line no-console
@@ -59,7 +58,8 @@ slack.init((data, ws) => {
     }
 
     const parsedUserData = JSON.parse(userData);
-    users = parsedUserData.members.filter(user => !user.deleted && user.id !== currentUser.id);
+    users = parsedUserData.members
+      .filter(user => !user.deleted && user.id !== dataStore.getCurrentUser().id);
 
     components.userList.setItems(users.map(slackUser => slackUser.name));
     components.screen.render();
@@ -105,8 +105,8 @@ function updateMessages(data, markFn) {
       let i;
 
       // get the author
-      if (message.user === currentUser.id) {
-        username = currentUser.name;
+      if (message.user === dataStore.getCurrentUser().id) {
+        username = dataStore.getCurrentUser().name;
       } else {
         for (i = 0; i < len; i += 1) {
           if (message.user === users[i].id) {
@@ -120,13 +120,13 @@ function updateMessages(data, markFn) {
     .forEach((message) => {
       // add messages to window
       components.chatWindow.unshiftLine(
-        `{bold}${message.username}{/bold}: ${formatMessage(message.text, currentUser, users)}`
+        `{bold}${message.username}{/bold}: ${formatMessage(message.text, users)}`
       );
     });
 
   // mark the most recently read message
   if (data.messages.length) {
-    markFn(currentChannelId, data.messages[0].ts);
+    markFn(dataStore.getCurrentChannelId(), data.messages[0].ts);
   }
 
   // reset messageInput and give focus
@@ -149,12 +149,14 @@ components.userList.on('select', (data) => {
 
   slack.openIm(userId, (error, response, imData) => {
     const parsedImData = JSON.parse(imData);
-    currentChannelId = parsedImData.channel.id;
+    dataStore.setCurrentChannelId(parsedImData.channel.id);
 
     // load im history
-    slack.getImHistory(currentChannelId, (histError, histResponse, imHistoryData) => {
-      updateMessages(JSON.parse(imHistoryData), slack.markIm);
-    });
+    slack.getImHistory(
+      dataStore.getCurrentChannelId(),
+      (histError, histResponse, imHistoryData) => {
+        updateMessages(JSON.parse(imHistoryData), slack.markIm);
+      });
   });
 });
 
@@ -169,11 +171,13 @@ components.channelList.on('select', (data) => {
   // join the selected channel
   slack.joinChannel(channelName, (error, response, channelData) => {
     const parsedChannelData = JSON.parse(channelData);
-    currentChannelId = parsedChannelData.channel.id;
+    dataStore.setCurrentChannelId(parsedChannelData.channel.id);
 
     // get the previous messages of the channel and display them
-    slack.getChannelHistory(currentChannelId, (histError, histResponse, channelHistoryData) => {
-      updateMessages(JSON.parse(channelHistoryData), slack.markChannel);
-    });
+    slack.getChannelHistory(dataStore.getCurrentChannelId(),
+      (histError, histResponse, channelHistoryData) => {
+        updateMessages(JSON.parse(channelHistoryData), slack.markChannel);
+      }
+    );
   });
 });

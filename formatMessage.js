@@ -1,7 +1,8 @@
+const dataStore = require('./dataStore.js');
 const { UNKNOWN_USER_NAME } = require('./constants.js');
 
 // formats channel and user mentions readably
-function formatMessage(text, currentUser, users) {
+function formatMessage(text, users) {
   if (text === null || typeof text === 'undefined') {
     return '';
   }
@@ -15,8 +16,8 @@ function formatMessage(text, currentUser, users) {
       .forEach((userId) => {
         let username;
         let modifier;
-        if (userId === currentUser.id) {
-          username = currentUser.name;
+        if (userId === dataStore.getCurrentUser().id) {
+          username = dataStore.getCurrentUser().name;
           modifier = 'yellow-fg';
         } else {
           const user = users.find(potentialUser => potentialUser.id === userId);
