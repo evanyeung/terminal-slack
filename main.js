@@ -80,9 +80,13 @@ function formatMessageMentions(text) {
   }
 
   // find special words
-  return formattedText.replace(
-    /<!channel>/g,
-    '{yellow-fg}@channel{/yellow-fg}');
+  return formattedText
+    .replace(
+      /<!channel>/g,
+      '{yellow-fg}@channel{/yellow-fg}')
+    .replace(
+      /<!everyone>/g,
+      '{yellow-fg}@everyone{/yellow-fg}');
 }
 
 function handleNewMessage(message) {
@@ -188,7 +192,7 @@ slack.getChannels((error, response, data) => {
   }
 
   const channelData = JSON.parse(data);
-  channels = channelData.channels.filter(channel => !channel.is_archived);
+  channels = channelData.channels.filter(channel => !channel.is_archived && !channel.is_mpim);
 
   components.channelList.setItems(
     channels.map(slackChannel => slackChannel.name)
