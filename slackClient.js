@@ -1,14 +1,11 @@
-const fs = require('fs');
 const request = require('request');
 const WebSocket = require('ws');
 
 const TOKEN = process.env.SLACK_TOKEN;
 
 if (TOKEN === undefined) {
-  console.log( // eslint-disable-line no-console
-    'Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables.'
-  );
-  process.exit(1);
+  const throwError = 'Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables.';
+  throw throwError;
 }
 
 // makes a request to slack. Adds token to query
@@ -20,21 +17,19 @@ function slackRequest(endpoint, query, callback) {
     qs,
   }, (error, response, data) => {
     if (error) {
-      fs.writeFileSync('error_log.txt', error);
-      process.exit(1);
+      throw error;
     }
 
     if (response.statusCode !== 200) {
-      fs.writeFileSync('error_log.txt', `Response Error: ${response.statusCode}`);
-      process.exit(1);
+      const logError = `Response Error: ${response.statusCode}`;
+      throw logError;
     }
 
     const parsedData = JSON.parse(data);
     // name_taken is expected if trying to channels.join on a group
     if (!parsedData.ok && !(endpoint === 'channels.join' && parsedData.error === 'name_taken')) {
-      // can't see console.logs with blessed
-      fs.writeFileSync('error_log.txt', `Error: ${parsedData.error}`);
-      process.exit(1);
+      const logError = `Error: ${parsedData.error}`;
+      throw logError;
     }
 
     if (callback) {
