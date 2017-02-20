@@ -30,7 +30,8 @@ function slackRequest(endpoint, query, callback) {
     }
 
     const parsedData = JSON.parse(data);
-    if (!parsedData.ok) {
+    // name_taken is expected if trying to channels.join on a group
+    if (!parsedData.ok && !(endpoint === 'channels.join' && parsedData.error === 'name_taken')) {
       // can't see console.logs with blessed
       fs.writeFileSync('error_log.txt', `Error: ${parsedData.error}`);
       process.exit(1);
@@ -53,7 +54,12 @@ module.exports = {
   getChannels(callback) {
     slackRequest('channels.list', {}, (error, response, data) => {
       if (callback) {
-        callback(error, response, data);
+        const parsedData = JSON.parse(data);
+        slackRequest('groups.list', {}, (groupError, groupResponse, groupData) => {
+          const groupsData = JSON.parse(groupData);
+          parsedData.channels = parsedData.channels.concat(groupsData.groups);
+          callback(error, response, JSON.stringify(parsedData));
+        });
       }
     });
   },
@@ -62,12 +68,28 @@ module.exports = {
       name,
     }, (error, response, data) => {
       if (callback) {
-        callback(error, response, data);
+        const parsedData = JSON.parse(data);
+        if (!parsedData.ok && parsedData.error === 'name_taken') {
+          slackRequest('groups.list', {}, (groupError, groupResponse, groupData) => {
+            const groupList = JSON.parse(groupData);
+            groupList.groups.forEach((group) => {
+              if (group.name === name) {
+                callback(error, response, JSON.stringify({
+                  channel: group,
+                }));
+              }
+            });
+          });
+        } else {
+          callback(error, response, data);
+        }
       }
     });
   },
   getChannelHistory(id, callback) {
-    slackRequest('channels.history', {
+    const endpoint = id.startsWith('G') ? 'groups.history' : 'channels.history';
+
+    slackRequest(endpoint, {
       channel: id,
     }, (error, response, data) => {
       if (callback) {
@@ -76,7 +98,9 @@ module.exports = {
     });
   },
   markChannel(id, timestamp, callback) {
-    slackRequest('channels.mark', {
+    const endpoint = id.startsWith('G') ? 'groups.mark' : 'channels.mark';
+
+    slackRequest(endpoint, {
       channel: id,
       ts: timestamp,
     }, (error, response, data) => {
