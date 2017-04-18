@@ -3,7 +3,7 @@ Terminal Slack
 
 A terminal interface for Slack.
 
-##Controls
+## Controls
  - Ctrl-c - select channels list
     - Use the arrow keys (or j/k) and enter to select a channel
     - Use '/' to search for a channel (enter to submit search)
@@ -16,7 +16,7 @@ A terminal interface for Slack.
     - Use the arrow keys to scroll
  - Escape - exit
  
-##Setup
+## Setup
 Download and enter the directory with `$ git clone https://github.com/evanyeung/terminal-slack.git && cd terminal-slack`. Make sure you have node and npm installed (can be installed from https://nodejs.org/) and run `$ npm install` to install the dependencies.
 
 Note: This project requires Node v6.0.0 or higher.
