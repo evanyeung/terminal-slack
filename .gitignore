@@ -1,4 +1,16 @@
+# Editor/OS-specific files
 .DS_STORE
 *.swp
 *.swo
+
+# Log files
+npm-debug.log*
+
+# Vendor files
 node_modules/
+
+# Npm lock file (https://docs.npmjs.com/files/package-lock.json)
+package-lock.json
+
+# Yarn lock file (https://yarnpkg.com)
+yarn.lock
