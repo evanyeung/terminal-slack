@@ -5,7 +5,7 @@ const TOKEN = process.env.SLACK_TOKEN;
 
 if (TOKEN === undefined) {
   const throwError = 'Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables.';
-  throw throwError;
+  throw new Error(throwError);
 }
 
 // makes a request to slack. Adds token to query
@@ -17,19 +17,19 @@ function slackRequest(endpoint, query, callback) {
     qs,
   }, (error, response, data) => {
     if (error) {
-      throw error;
+      throw new Error(error);
     }
 
     if (response.statusCode !== 200) {
       const logError = `Response Error: ${response.statusCode}`;
-      throw logError;
+      throw new Error(logError);
     }
 
     const parsedData = JSON.parse(data);
     // name_taken is expected if trying to channels.join on a group
     if (!parsedData.ok && !(endpoint === 'channels.join' && parsedData.error === 'name_taken')) {
       const logError = `Error: ${parsedData.error}`;
-      throw logError;
+      throw new Error(logError);
     }
 
     if (callback) {
