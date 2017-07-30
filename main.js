@@ -139,9 +139,8 @@ slack.init((data, ws) => {
   // event handler when message is submitted
   components.messageInput.on('submit', (text) => {
     if (!text || !text.length) {
-        components.messageInput.clearValue();
-        components.messageInput.focus();
-        return;
+      components.messageInput.focus();
+      return;
     }
 
     const id = getNextId();
