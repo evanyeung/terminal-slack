@@ -8,6 +8,7 @@ module.exports = {
       autopadding: true,
       smartCSR: true,
       title: 'Slack',
+      fullUnicode: true,
     });
 
     const container = blessed.box({
