@@ -75,14 +75,16 @@ function formatMessageMentions(text) {
 
         formattedText = text.replace(
           new RegExp(`<@${userId}>`, 'g'),
-          `{${modifier}}@${username}{/${modifier}}`);
+          `{${modifier}}@${username}{/${modifier}}`
+        );
       });
   }
 
   // find special words
   return formattedText.replace(
     /<!channel>/g,
-    '{yellow-fg}@channel{/yellow-fg}');
+    '{yellow-fg}@channel{/yellow-fg}'
+  );
 }
 
 function handleNewMessage(message) {
