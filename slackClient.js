@@ -1,7 +1,10 @@
 const fs = require('fs');
 const request = require('request');
 const WebSocket = require('ws');
+// Load in the environment variables
+const dotenv = require('dotenv');
 
+dotenv.load({ path: '.env' });
 const TOKEN = process.env.SLACK_TOKEN;
 
 if (TOKEN === undefined) {

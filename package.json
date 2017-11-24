@@ -5,6 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "blessed": "^0.1.56",
+    "dotenv": "^4.0.0",
     "node-notifier": "^5.0.2",
     "request": "^2.55.0",
     "ws": "^3.3.1"
