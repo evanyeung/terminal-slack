@@ -1,0 +1,36 @@
+{
+  "language": "node_js",
+  "node_js": [
+    "node"
+  ],
+  "before_script": [
+    "yarn run pack"
+  ],
+  "deploy": [
+    {
+      "provider": "releases",
+      "api_key": {
+        "secure": "YOU_GH_API_KEY"
+      },
+      "file_glob": true,
+      "file": "packed/*",
+      "skip_cleanup": true,
+      "on": {
+        "tags": true
+      }
+    },
+    {
+      "provider": "npm",
+      "email": "your-npm@email.de",
+      "tag": "canary",
+      "api_key": {
+        "secure": "YOUR_API_KEY"
+      },
+      "skip_cleanup": true,
+      "on": {
+        "tags": true
+      }
+    }
+  ],
+  "after_deploy": "npm install -g now"
+}
