@@ -60,6 +60,7 @@ module.exports = {
     const messageInput = blessed.textbox({
       width: '90%',
       left: '5%',
+      height: '5%+3',
       top: '85%',
       keys: true,
       vi: true,
