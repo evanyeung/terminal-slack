@@ -88,11 +88,18 @@ function formatMessageMentions(text) {
 }
 
 function handleNewMessage(message) {
+  let text;
   let username;
+  let author;
+
   if (message.user === currentUser.id) {
     username = currentUser.name;
   } else {
-    const author = users.find(user => message.user === user.id);
+    if (users) {
+      author = users.find(user => message.user === user.id)
+    } else {
+      author = null;
+    }
     username = (author && author.name) || UNKNOWN_USER_NAME;
 
     notifier.notify({
@@ -103,14 +110,57 @@ function handleNewMessage(message) {
     });
   }
 
-  if (message.channel !== currentChannelId ||
-      typeof message.text === 'undefined') {
+  if (typeof message.text === 'undefined') {
     return;
   }
+  // Message for another channel, update its "counter"
+  if (message.channel !== currentChannelId) {
+    const channels = cachedChannelData.channels;
+    channel = channels.filter(chan => chan.id == message.channel)[0]
+    if (channel) {
+      regex = new RegExp(`^${channel.name}\\b`)      
+      const channelIndex = components.channelList.fuzzyFind(regex)
+      var listItem = components.channelList.getItem(channelIndex)
+      listItem.style.fg = 'red'
 
+      var count = listItem.content.match(/\s(\d+)$/)
+      if (count) {
+        count = parseInt(count) + 1
+      } else {
+        count = 1
+      }
+      components.channelList.setItem(channelIndex, `${channel.name} ${count}`)
+    } else {
+      author = users.find(user => message.user === user.id)
+      if (author) {
+        regex = new RegExp(`^${author.name}\\b`)      
+        const channelIndex = components.userList.fuzzyFind(regex)
+        var listItem = components.userList.getItem(channelIndex)
+        listItem.style.fg = 'red'
+
+        var count = listItem.content.match(/\s(\d+)$/)
+        if (count) { 
+          count = parseInt(count) + 1
+        } else {
+          count = 1
+        }
+        components.userList.setItem(channelIndex, `${author.name} ${count}`)
+        // text = `@${author.name} - ${channelIndex} - #${count}`
+      } else {
+        // unknown message
+        // TODO
+        // text = `?? ${message.channel} ?? : ${JSON.stringify(message)}`
+      }
+      return
+    }
+  } else {
+    text = renderImageFromLink(message.text);
+    text = formatMessageMentions(text);
+  }
   components.chatWindow.insertBottom(
-    `{bold}${username}{/bold}: ${formatMessageMentions(message.text)}`
+    `{bold}${username}{/bold}: ${text}`
   );
+
   components.chatWindow.scroll(SCROLL_PER_MESSAGE);
   components.screen.render();
 }
@@ -174,7 +224,7 @@ slack.init((data, ws) => {
     }
 
     const parsedUserData = JSON.parse(userData);
-    users = parsedUserData.members.filter(user => !user.deleted && user.id !== currentUser.id);
+    users = parsedUserData.members.filter(user => !user.deleted);
 
     components.userList.setItems(users.map(slackUser => slackUser.name));
     components.screen.render();
@@ -184,6 +234,8 @@ slack.init((data, ws) => {
 // set the channel list
 components.channelList.setItems(['Connecting to Slack...']);
 components.screen.render();
+
+let cachedChannelData;
 
 // set the channel list to the channels returned from slack
 slack.getChannels((error, response, data) => {
@@ -201,6 +253,8 @@ slack.getChannels((error, response, data) => {
     channels.map(slackChannel => slackChannel.name)
   );
   components.screen.render();
+
+  cachedChannelData = channelData;
 });
 
 // event handler when user selects a channel
@@ -230,13 +284,14 @@ function updateMessages(data, markFn) {
           }
         }
       }
+
       return { text: message.text, username: username || UNKNOWN_USER_NAME };
     })
     .forEach((message) => {
-      // add messages to window
       components.chatWindow.unshiftLine(
         `{bold}${message.username}{/bold}: ${formatMessageMentions(message.text)}`
       );
+
     });
 
   // mark the most recently read message
@@ -252,9 +307,12 @@ function updateMessages(data, markFn) {
 }
 
 components.userList.on('select', (data) => {
-  const username = data.content;
+  // ignore channel counts and reset styling
+  const username = data.content.match(/^\S+/)[0];
+  data.content = username;
+  data.style.fg = '';
 
-  // a channel was selected
+  // a user channel was selected
   components.mainWindowTitle.setContent(`{bold}${username}{/bold}`);
   components.chatWindow.setContent('Getting messages...');
   components.screen.render();
@@ -274,7 +332,10 @@ components.userList.on('select', (data) => {
 });
 
 components.channelList.on('select', (data) => {
-  const channelName = data.content;
+  // ignore channel counts and reset styling
+  const channelName = data.content.match(/^\S+/)[0]; 
+  data.content = channelName;
+  data.style.fg = '';
 
   // a channel was selected
   components.mainWindowTitle.setContent(`{bold}${channelName}{/bold}`);
