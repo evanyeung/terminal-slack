@@ -2,3 +2,7 @@
 *.swp
 *.swo
 node_modules/
+config.json
+server/slack-config*.json
+error_log.txt
+package-lock.json

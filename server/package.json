@@ -1,0 +1,17 @@
+{
+  "name": "terminal-slack-server",
+  "version": "1.0.0",
+  "description": "oauth token local server for slack-terminal",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "courtenay",
+  "license": "MIT",
+  "keywords": [],
+  "dependencies": {
+    "express": "^4.16.2",
+    "sanitize-filename": "^1.6.1"
+  }
+}
