@@ -38,18 +38,28 @@ A terminal interface for Slack.
 	npm install
 	```
 	
-4. Create your Legacy Slack API token.
+4. Create your Slack OAUth token. You'll need to make an app to hand out this token since you shouldn't trust anyone on the internet to generate one:
 
-	- Go to the [Slack Legacy Tokens](https://api.slack.com/custom-integrations/legacy-tokens) page
-	- Click **Generate Token**
-
-5. Install your token on your local machine, inserting your token between the quotes:
-
+  - Make yourself a new slack app at https://api.slack.com/apps call it something like 'my textmode'
+  - Set redirect url: `http://localhost:8080/textmode`
+  - Set scope: `channels:history` (doesn't actually matter, but needs at least one)
+  - Save the *client ID*, and *client secret*
+  - Add the slack app to your (a) workspace.
+	- Install and run the local server replacing values as saved above:
 	```
-	export SLACK_TOKEN='your-slack-token-here'
-	```
+	  cd server
+	  npm install
+	  CLIENT_ID=your-client-id CLIENT_SECRET=your-client-scret REDIRECT_URI=http://localhost:8080/textmode node server.js
+  ```
+	- Open http://localhost:8080/auth
+	- Follow the link, auth to slack.
+	- Your token is now pasted to screen and saved in ./slack-config.{workspace}.json
+  - On success, close browser window .
+	- Stop the server (ctrl-c)
+	- `cp slack-config.{workspace}.json ../config.json`
+	- Done! 
 
-6. Run the application: 
+5. Run the application: 
 
 	```
 	node main.js
@@ -60,8 +70,4 @@ A terminal interface for Slack.
 ## Troubleshooting
  - **Terminal Slack opens for a second but then closes again**
 
- 	This might be due to your `SLACK_TOKEN` not being recognised. Make sure the put your `SLACK_TOKEN` between the two single quotes when exporting it:
- 	
- 	```
- 	export SLACK_TOKEN='xoxp-254112160503-252950188691-252375361712-6cbf56aada30951a9d310a5f23d032a0'
- 	```
+ 	Make sure you have a fresh token by following oauth instructions above.
