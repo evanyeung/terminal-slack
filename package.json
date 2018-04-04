@@ -1,10 +1,11 @@
 {
   "name": "terminal-slack",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A terminal client for slack",
   "main": "main.js",
   "dependencies": {
     "blessed": "^0.1.56",
+    "dotenv": "^5.0.1",
     "node-notifier": "^5.0.2",
     "request": "^2.55.0",
     "ws": "^3.3.1"
