@@ -43,10 +43,10 @@ A terminal interface for Slack.
 	- Go to the [Slack Legacy Tokens](https://api.slack.com/custom-integrations/legacy-tokens) page
 	- Click **Generate Token**
 
-5. Install your token on your local machine, inserting your token between the quotes:
+5. Copy `.env.sample` to `.env` and update the `SLACK_TOKEN=` line to the following:
 
 	```
-	export SLACK_TOKEN='your-slack-token-here'
+	SLACK_TOKEN=your-slack-token-here
 	```
 
 6. Run the application: 
