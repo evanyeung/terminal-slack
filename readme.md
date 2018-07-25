@@ -66,7 +66,8 @@ A terminal interface for Slack.
 - **Terminal Slack opens for a second but then closes again**
 
   ````
-  	This might be due to your `SLACK_TOKEN` not being recognised. Make sure the put your `SLACK_TOKEN` inside the `.env` file you created eariler for this very purpose.
+  	This might be due to your `SLACK_TOKEN` not being recognised. Make sure the put your `SLACK_TOKEN`
+    inside the `.env` file you created eariler for this very purpose.
 
   	```
   	SLACK_TOKEN='xoxp-254112160503-252950188691-252375361712-6cbf56aada30951a9d310a5f23d032a0'
