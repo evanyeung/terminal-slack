@@ -56,7 +56,7 @@ A terminal interface for Slack.
 6.  Run the application:
 
     ```
-    node main.js
+    npm start
     ```
 
 7.  Terminal Slack should now launch.
