@@ -1,14 +1,14 @@
-const fs = require('fs');
-const request = require('request');
-const WebSocket = require('ws');
-require('dotenv').config();
+const fs = require("fs");
+const request = require("request");
+const WebSocket = require("ws");
+require("dotenv").config();
 
 const TOKEN = process.env.SLACK_TOKEN;
 
 if (TOKEN === undefined) {
   console.log(
     // eslint-disable-line no-console
-    'Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables.'
+    "Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables."
   );
   process.exit(1);
 }
@@ -20,17 +20,17 @@ function slackRequest(endpoint, query, callback) {
   request.get(
     {
       url: `https://slack.com/api/${endpoint}`,
-      qs,
+      qs
     },
     (error, response, data) => {
       if (error) {
-        fs.writeFileSync('error_log.txt', error);
+        fs.writeFileSync("error_log.txt", error);
         process.exit(1);
       }
 
       if (response.statusCode !== 200) {
         fs.writeFileSync(
-          'error_log.txt',
+          "error_log.txt",
           `Response Error: ${response.statusCode}`
         );
         process.exit(1);
@@ -39,7 +39,7 @@ function slackRequest(endpoint, query, callback) {
       const parsedData = JSON.parse(data);
       if (!parsedData.ok) {
         // can't see console.logs with blessed
-        fs.writeFileSync('error_log.txt', `Error: ${parsedData.error}`);
+        fs.writeFileSync("error_log.txt", `Error: ${parsedData.error}`);
         process.exit(1);
       }
 
@@ -52,14 +52,14 @@ function slackRequest(endpoint, query, callback) {
 
 module.exports = {
   init(callback) {
-    slackRequest('rtm.start', {}, (error, response, data) => {
+    slackRequest("rtm.start", {}, (error, response, data) => {
       const parsedData = JSON.parse(data);
       const ws = new WebSocket(parsedData.url);
       callback(parsedData, ws);
     });
   },
   getChannels(callback) {
-    slackRequest('channels.list', {}, (error, response, data) => {
+    slackRequest("channels.list", {}, (error, response, data) => {
       if (callback) {
         callback(error, response, data);
       }
@@ -67,9 +67,9 @@ module.exports = {
   },
   joinChannel(name, callback) {
     slackRequest(
-      'channels.join',
+      "channels.join",
       {
-        name,
+        name
       },
       (error, response, data) => {
         if (callback) {
@@ -80,9 +80,9 @@ module.exports = {
   },
   getChannelHistory(id, callback) {
     slackRequest(
-      'channels.history',
+      "channels.history",
       {
-        channel: id,
+        channel: id
       },
       (error, response, data) => {
         if (callback) {
@@ -93,10 +93,10 @@ module.exports = {
   },
   markChannel(id, timestamp, callback) {
     slackRequest(
-      'channels.mark',
+      "channels.mark",
       {
         channel: id,
-        ts: timestamp,
+        ts: timestamp
       },
       (error, response, data) => {
         if (callback) {
@@ -106,7 +106,7 @@ module.exports = {
     );
   },
   getUsers(callback) {
-    slackRequest('users.list', {}, (error, response, data) => {
+    slackRequest("users.list", {}, (error, response, data) => {
       if (callback) {
         callback(error, response, data);
       }
@@ -114,9 +114,9 @@ module.exports = {
   },
   openIm(id, callback) {
     slackRequest(
-      'im.open',
+      "im.open",
       {
-        user: id,
+        user: id
       },
       (error, response, data) => {
         if (callback) {
@@ -127,9 +127,9 @@ module.exports = {
   },
   getImHistory(id, callback) {
     slackRequest(
-      'im.history',
+      "im.history",
       {
-        channel: id,
+        channel: id
       },
       (error, response, data) => {
         if (callback) {
@@ -140,10 +140,10 @@ module.exports = {
   },
   markIm(id, timestamp, callback) {
     slackRequest(
-      'im.mark',
+      "im.mark",
       {
         channel: id,
-        ts: timestamp,
+        ts: timestamp
       },
       (error, response, data) => {
         if (callback) {
@@ -151,5 +151,5 @@ module.exports = {
         }
       }
     );
-  },
+  }
 };
