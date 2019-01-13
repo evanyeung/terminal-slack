@@ -31,6 +31,9 @@
   ],
   "author": "Evan Yeung",
   "license": "MIT",
+  "maintainers": [
+    "Mestafor"
+  ],
   "bugs": {
     "url": "https://github.com/evanyeung/terminal-slack/issues"
   },
