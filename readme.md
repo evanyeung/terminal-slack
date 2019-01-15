@@ -1,12 +1,11 @@
 # Terminal Slack
 A terminal interface for Slack.
 
-### TODO: 
+### Updated: 
 ```
-1. Run the few instance with different SLACK_TOKEN
+1. Run the few teams
 2. Show notification when someone send you a message
-3. Remove message from terminal list of messages (now not delete)
-4. Show mark of unreaded message from user or channel
+3. Remove message from active channel
 ```
 
 ![Screenshot of Termianl Slack](screen-shot.png)

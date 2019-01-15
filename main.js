@@ -9,8 +9,8 @@ const components = require('./lib/components');
 const slack = require('./slackClient.js');
 const handlers = require('./lib/handlers');
 
-// DONE: show message on deleted and remove it from active channel
-// DONE: refactor code
+// DONE: remove message from channel, when someone deleted it
+// DONE: refactor code, added my lib folder, added tests
 // DONE: Run 2 and more slack teams
 
 // set the channel list
