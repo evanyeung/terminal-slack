@@ -4,7 +4,7 @@ A terminal interface for Slack.
 ### Updated: 
 ```
 1. Run the few teams
-2. Show notification when someone send you a message
+2. Show notification when someone remove a message
 3. Remove message from active channel
 ```
 
