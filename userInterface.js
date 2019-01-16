@@ -123,7 +123,7 @@ module.exports = {
 
     const channelsBox = blessed.box({
       width: '100%',
-      height: '60%',
+      height: '50%',
       border: {
         type: 'line',
       },
@@ -161,8 +161,8 @@ module.exports = {
 
     const usersBox = blessed.box({
       width: '100%',
-      height: '40%',
-      top: '60%',
+      height: '50%',
+      top: '50%',
       border: {
         type: 'line',
       },

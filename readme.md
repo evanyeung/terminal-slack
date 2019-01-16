@@ -1,6 +1,13 @@
 # Terminal Slack
 A terminal interface for Slack.
 
+### Updated: 
+```
+1. Run the few teams
+2. Show notification when someone remove a message
+3. Remove message from active channel
+```
+
 ![Screenshot of Termianl Slack](screen-shot.png)
 
 ## Controls
@@ -14,6 +21,8 @@ A terminal interface for Slack.
 | Select users list | `ctrl` + `u` |
 | Select writing area | `ctrl` + `w` |
 | Select message list | `ctrl` + `l` |
+| Move next team | `ctrl` + `n` |
+| Move previous team | `ctrl` + `p` |
  
 ## Prerequsites
  - [Node](https://nodejs.org/en/) v6.0.0 or higher
@@ -43,11 +52,7 @@ A terminal interface for Slack.
 	- Go to the [Slack Legacy Tokens](https://api.slack.com/custom-integrations/legacy-tokens) page
 	- Click **Generate Token**
 
-5. Install your token on your local machine, inserting your token between the quotes:
-
-	```
-	export SLACK_TOKEN='your-slack-token-here'
-	```
+5. Install your token on .env.js (rename example.env.js to .env.js)
 
 6. Run the application: 
 
@@ -57,11 +62,5 @@ A terminal interface for Slack.
 	
 7. Terminal Slack should now launch.
 
-## Troubleshooting
- - **Terminal Slack opens for a second but then closes again**
-
- 	This might be due to your `SLACK_TOKEN` not being recognised. Make sure the put your `SLACK_TOKEN` between the two single quotes when exporting it:
- 	
- 	```
- 	export SLACK_TOKEN='xoxp-254112160503-252950188691-252375361712-6cbf56aada30951a9d310a5f23d032a0'
- 	```
+<!-- ## Troubleshooting
+ - **Terminal Slack opens for a second but then closes again** -->

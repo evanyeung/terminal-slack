@@ -1,57 +1,80 @@
 const fs = require('fs');
 const request = require('request');
 const WebSocket = require('ws');
+const app = require('./lib/app');
 
-const TOKEN = process.env.SLACK_TOKEN;
+// const TOKEN = process.env.SLACK_TOKEN;
 
-if (TOKEN === undefined) {
-  console.log( // eslint-disable-line no-console
-    'Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables.'
-  );
-  process.exit(1);
-}
+// if (TOKEN === undefined) {
+//   console.log( // eslint-disable-line no-console
+//     'Error: SLACK_TOKEN undefined. Please add SLACK_TOKEN to the environment variables.'
+//   );
+//   process.exit(1);
+// }
 
 // makes a request to slack. Adds token to query
 function slackRequest(endpoint, query, callback) {
   const qs = query;
-  qs.token = TOKEN;
-  request.get({
-    url: `https://slack.com/api/${endpoint}`,
-    qs,
-  }, (error, response, data) => {
-    if (error) {
-      fs.writeFileSync('error_log.txt', error);
-      process.exit(1);
-    }
+  // qs.token = TOKEN;
+  // try {
+  //   qs.token = app.activeTeamId;
+  // } catch (e) {
+  //   throw new Error(e);
+  // }
 
-    if (response.statusCode !== 200) {
-      fs.writeFileSync('error_log.txt', `Response Error: ${response.statusCode}`);
-      process.exit(1);
-    }
+  return new Promise((resolve, reject) => {
 
-    const parsedData = JSON.parse(data);
-    if (!parsedData.ok) {
-      // can't see console.logs with blessed
-      fs.writeFileSync('error_log.txt', `Error: ${parsedData.error}`);
-      process.exit(1);
-    }
+    request.get({
+      url: `https://slack.com/api/${endpoint}`,
+      qs,
+    }, (error, response, data) => {
+      if (error) {
+        fs.writeFileSync('error_log.txt', error);
+        process.exit(1);
+        reject(error);
+      }
 
-    if (callback) {
-      callback(error, response, data);
-    }
+      if (response.statusCode !== 200) {
+        fs.writeFileSync('error_log.txt', `Response Error: ${response.statusCode}`);
+        process.exit(1);
+      }
+
+      const parsedData = JSON.parse(data);
+      if (!parsedData.ok) {
+        // can't see console.logs with blessed
+        fs.writeFileSync('error_log.txt', `Error: ${parsedData.error}`);
+        process.exit(1);
+      }
+
+      if (typeof callback === 'function') {
+        callback(error, response, data);
+      }
+
+      resolve(data);
+    });
   });
 }
 
 module.exports = {
-  init(callback) {
-    slackRequest('rtm.start', {}, (error, response, data) => {
+  /**
+   * Init slack instance
+   * @param {string} token
+   * @param {(token: string; parsedData: object; ws: WebSocket) => void} callback
+   */
+  async init(token, callback) {
+    await slackRequest('rtm.start', { token }, (error, response, data) => {
       const parsedData = JSON.parse(data);
       const ws = new WebSocket(parsedData.url);
-      callback(parsedData, ws);
-    });
+      callback(token, parsedData, ws);
+    })
+      .catch((e) => {
+        throw new Error(e);
+      });
+
+    return 'done';
   },
-  getChannels(callback) {
-    slackRequest('channels.list', {}, (error, response, data) => {
+  getChannels(token, callback) {
+    slackRequest('channels.list', { token }, (error, response, data) => {
       if (callback) {
         callback(error, response, data);
       }
@@ -85,35 +108,38 @@ module.exports = {
       }
     });
   },
-  getUsers(callback) {
-    slackRequest('users.list', {}, (error, response, data) => {
+  getUsers(token, callback) {
+    slackRequest('users.list', { token }, (error, response, data) => {
       if (callback) {
         callback(error, response, data);
       }
     });
   },
-  openIm(id, callback) {
+  openIm(token, id, callback) {
     slackRequest('im.open', {
       user: id,
+      token,
     }, (error, response, data) => {
       if (callback) {
         callback(error, response, data);
       }
     });
   },
-  getImHistory(id, callback) {
+  getImHistory(token, id, callback) {
     slackRequest('im.history', {
       channel: id,
+      token,
     }, (error, response, data) => {
       if (callback) {
         callback(error, response, data);
       }
     });
   },
-  markIm(id, timestamp, callback) {
+  markIm(token, id, timestamp, callback) {
     slackRequest('im.mark', {
       channel: id,
       ts: timestamp,
+      token,
     }, (error, response, data) => {
       if (callback) {
         callback(error, response, data);

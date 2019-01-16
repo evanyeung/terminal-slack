@@ -18,7 +18,7 @@
   },
   "scripts": {
     "start": "node .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test"
   },
   "repository": {
     "type": "git",
@@ -31,6 +31,9 @@
   ],
   "author": "Evan Yeung",
   "license": "MIT",
+  "maintainers": [
+    "Mestafor"
+  ],
   "bugs": {
     "url": "https://github.com/evanyeung/terminal-slack/issues"
   },
