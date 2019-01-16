@@ -123,7 +123,7 @@ module.exports = {
 
     const channelsBox = blessed.box({
       width: '100%',
-      height: '30%',
+      height: '50%',
       border: {
         type: 'line',
       },
@@ -161,8 +161,8 @@ module.exports = {
 
     const usersBox = blessed.box({
       width: '100%',
-      height: '30%',
-      top: '30%',
+      height: '50%',
+      top: '50%',
       border: {
         type: 'line',
       },
@@ -198,47 +198,12 @@ module.exports = {
       tags: true,
     });
 
-    const loggerBox = blessed.box({
-      width: '100%',
-      height: '40%',
-      top: '60%',
-      border: {
-        type: 'line',
-      },
-      style: {
-        border: {
-          fg: '#888',
-        },
-      },
-    });
-
-    const loggerTitle = blessed.text({
-      width: '90%',
-      left: '5%',
-      align: 'center',
-      content: '{bold}Logs{/bold}',
-      tags: true,
-    });
-
-    const loggerText = blessed.box({
-      width: '90%',
-      height: '70%',
-      left: '5%',
-      top: '20%',
-      keys: true,
-      scrollable: true,
-      alwaysScroll: true,
-    });
-
     channelsBox.append(channelsTitle);
     channelsBox.append(channelList);
     usersBox.append(usersTitle);
     usersBox.append(userList);
-    loggerBox.append(loggerTitle);
-    loggerBox.append(loggerText);
     sideBar.append(channelsBox);
     sideBar.append(usersBox);
-    sideBar.append(loggerBox);
     mainWindow.append(mainWindowTitle);
     mainWindow.append(chatWindow);
     mainWindow.append(messageInput);
@@ -251,7 +216,6 @@ module.exports = {
     keyBindings['C-u'] = userList.focus.bind(userList); // ctrl-u for users
     keyBindings['C-w'] = messageInput.focus.bind(messageInput); // ctrl-w for write
     keyBindings['C-l'] = chatWindow.focus.bind(chatWindow); // ctrl-l for message list
-    keyBindings['C-d'] = chatWindow.focus.bind(loggerText); // ctrl-l for message list
 
     function callKeyBindings(ch, key) {
       const fn = keyBindings[key.full];
@@ -260,7 +224,6 @@ module.exports = {
       }
     }
 
-    loggerText.on('keypress', callKeyBindings);
     userList.on('keypress', callKeyBindings);
     channelList.on('keypress', callKeyBindings);
     chatWindow.on('keypress', callKeyBindings);
@@ -300,9 +263,6 @@ module.exports = {
     chatWindow.on('focus', onFocus.bind(null, mainWindow));
     chatWindow.on('blur', onBlur.bind(null, mainWindow));
 
-    loggerText.on('focus', onFocus.bind(null, loggerBox));
-    loggerText.on('blur', onBlur.bind(null, loggerBox));
-
     return {
       screen,
       usersBox,
@@ -315,9 +275,6 @@ module.exports = {
       mainWindowTitle,
       chatWindow,
       messageInput,
-      loggerBox,
-      loggerTitle,
-      loggerText,
     };
   },
 };
